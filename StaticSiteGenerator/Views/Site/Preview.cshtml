@@ -1,0 +1,29 @@
+@model StaticSiteGenerator.Models.SiteEditorViewModel
+
+@{
+    ViewData["Title"] = "Pré-visualização";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>@Model.LandingPage.Title</title>
+    <link rel="stylesheet" href="/css/@Model.LandingPage.Theme" />
+</head>
+<body>
+    <nav>
+        @foreach (var item in Model.MenuItems)
+        {
+            <a href="@item.Link">@item.Title</a>
+        }
+    </nav>
+
+    <h1>@Model.LandingPage.Title</h1>
+    <p>@Model.LandingPage.Subtitle</p>
+
+    <hr />
+
+    <p><a href="/Site/Index">Voltar ao editor</a></p>
+</body>
+</html>

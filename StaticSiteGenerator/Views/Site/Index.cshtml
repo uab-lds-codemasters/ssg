@@ -1,0 +1,21 @@
+@model StaticSiteGenerator.Models.SiteEditorViewModel
+
+@{
+    ViewData["Title"] = "Editor JSON";
+}
+
+<h1>Editor JSON</h1>
+
+<form action="/Site/Preview" method="post" target="_blank">
+    <div>
+        <label for="landingJson">Landing Page JSON</label>
+        <textarea id="landingJson" name="landingJson" rows="15" cols="80">@Model.LandingJson</textarea>
+    </div>
+
+    <div>
+        <label for="menuJson">Menu JSON</label>
+        <textarea id="menuJson" name="menuJson" rows="15" cols="80">@Model.MenuJson</textarea>
+    </div>
+
+    <button type="submit">Gerar</button>
+</form>
