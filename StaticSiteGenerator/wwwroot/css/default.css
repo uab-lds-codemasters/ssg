@@ -1,0 +1,24 @@
+/*
+ * Unidade Curricular: 21179 - Laboratórios de Desenvolvimento de Software
+ * Grupo: Grupo 1 - CodeMasters
+ * Projeto: Static Site Generator com Json.NET
+ * Ficheiro: default.css
+ * Descrição: Tema CSS por defeito do site gerado.
+ */
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 40px;
+    background-color: #ffffff;
+    color: #222222;
+}
+
+h1 {
+    color: #1f4e79;
+}
+
+a {
+    margin-right: 15px;
+    text-decoration: none;
+    color: #1f4e79;
+}
