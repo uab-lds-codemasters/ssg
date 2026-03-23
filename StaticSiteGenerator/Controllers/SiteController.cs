@@ -60,5 +60,22 @@ namespace StaticSiteGenerator.Controllers
 
             return View(viewModel);
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Reset()
+        {
+            string defaultLanding = "{\n  \"title\": \"CodeMasters Static Site\",\n  \"subtitle\": \"Exemplo de página inicial\",\n  \"theme\": \"default.css\"\n}";
+            string defaultMenu = "[\n  {\n    \"title\": \"Início\",\n    \"link\": \"/\"\n  }\n]";
+
+            string dataFolder = Path.Combine(Directory.GetCurrentDirectory(), "Data");
+            Directory.CreateDirectory(dataFolder);
+            System.IO.File.WriteAllText(Path.Combine(dataFolder, "landingPage.json"), defaultLanding);
+            System.IO.File.WriteAllText(Path.Combine(dataFolder, "menu.json"), defaultMenu);
+
+            TempData["Message"] = "Ficheiros restaurados para os valores por defeito.";
+            return RedirectToAction("Index");
+        }
     }
 }
+

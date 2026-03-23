@@ -19,3 +19,13 @@
 
     <button type="submit">Gerar</button>
 </form>
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert">@TempData["Message"]</div>
+}
+
+<form action="/Site/Reset" method="post">
+    @Html.AntiForgeryToken()
+    <button type="submit">Restaurar padrões</button>
+</form>
