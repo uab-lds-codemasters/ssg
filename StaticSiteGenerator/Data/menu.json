@@ -3,24 +3,20 @@
     "title": "Início",
     "link": "/"
   },
-{
-    "title": "Blog",
-    "link": "/about"
-  },
-
   {
-    "title": "Teste",
-    "link": "/about"
+    "title": "google",
+    "link": "www.google.pt"
   },
-
-
   {
-    "title": "Teste 2",
-    "link": "/about"
+    "title": "GitHub",
+    "link": "https://github.com/uab-lds-codemasters/ssg"
   },
-  
   {
-    "title": "Sobre",
-    "link": "/about"
+    "title": "UAb",
+    "link": "https://elearning.uab.pt/my/"
+  },
+  {
+    "title": "Onedrive",
+    "link": "https://uabpt-my.sharepoint.com/:f:/g/personal/2104178_estudante_uab_pt/IgCmTV77t0FuTJmW4iMbiImNAdJ82OCJS5XKwFQtgAEkWeM?e=219Enf"
   }
 ]

@@ -6,19 +6,126 @@
  * Descrição: Tema CSS por defeito do site gerado.
  */
 
+/* --- Base --- */
 body {
     font-family: Arial, sans-serif;
-    margin: 40px;
+    margin: 0;
+    padding: 0;
     background-color: #ffffff;
     color: #222222;
-}
-
-h1 {
-    color: #1f4e79;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 a {
-    margin-right: 15px;
-    text-decoration: none;
     color: #1f4e79;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+a:hover {
+    color: #163a5a;
+}
+
+/* --- Navegação — barra branca, texto azul escuro --- */
+nav {
+    background-color: #ffffff;
+    padding: 12px 24px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    border-bottom: 3px solid #1f4e79;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+nav a {
+    color: #1f4e79;
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+}
+
+nav a:hover {
+    background-color: #e8f0fe;
+    color: #163a5a;
+}
+
+/* --- Header — fundo azul escuro, texto branco --- */
+header {
+    background-color: #1f4e79;
+    padding: 48px 24px;
+    text-align: center;
+    border-bottom: 4px solid #0a1929;
+}
+
+header h1 {
+    color: #ffffff;
+    font-size: 2.2rem;
+    margin-bottom: 8px;
+}
+
+header .subtitle {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+/* --- Conteúdo principal --- */
+main {
+    flex: 1;
+    padding: 32px 24px;
+    background-color: #ffffff;
+}
+
+/* --- Botão voltar --- */
+.btn-voltar {
+    display: inline-block;
+    background-color: #1f4e79;
+    color: #ffffff;
+    padding: 10px 20px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.btn-voltar:hover {
+    background-color: #163a5a;
+    color: #ffffff;
+}
+
+/* --- Footer — azul escuro, texto branco --- */
+footer {
+    background-color: #1f4e79;
+    color: #ffffff;
+    text-align: center;
+    padding: 16px 24px;
+    border-top: 4px solid #0a1929;
+}
+
+footer p {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+/* --- Responsividade --- */
+@media (max-width: 768px) {
+    nav {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+
+    header {
+        padding: 32px 16px;
+    }
+
+    header h1 {
+        font-size: 1.6rem;
+    }
+
+    main {
+        padding: 20px 16px;
+    }
 }
