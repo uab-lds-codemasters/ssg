@@ -13,5 +13,10 @@ namespace StaticSiteGenerator.Models
         public string Title { get; set; } = string.Empty;
         public string Subtitle { get; set; } = string.Empty;
         public string Theme { get; set; } = string.Empty;
+        public string Content { get; set; } = string.Empty;
+        public string ImagePath { get; set; } = string.Empty;
+        public string DocumentPath { get; set; } = string.Empty;
+        public string DocumentName { get; set; } = string.Empty;
+        public string Footer { get; set; } = "Gerado com CodeMasters SSG";
     }
 }
