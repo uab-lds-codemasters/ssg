@@ -48,8 +48,13 @@
     </nav>
 
     <header>
-        <h1>@Model.LandingPage.Title</h1>
-        <p class="subtitle">@Model.LandingPage.Subtitle</p>
+        <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
+            <img src="~/css/img/logo.jpg" alt="Logo CodeMasters" style="height: 80px; width: auto; flex-shrink: 0;" />
+            <div style="text-align: center; flex: 1;">
+                <h1 style="margin-bottom: 4px;">@Model.LandingPage.Title</h1>
+                <p class="subtitle" style="margin: 0;">@Model.LandingPage.Subtitle</p>
+            </div>
+        </div>
     </header>
 
     <main>

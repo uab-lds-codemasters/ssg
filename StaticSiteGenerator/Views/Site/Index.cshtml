@@ -11,8 +11,21 @@
 
 <link rel="stylesheet" href="~/css/editor.css" />
 
-<h1 class="mb-1">CodeMasters &#8212; Static Site Generator</h1>
-<p class="text-muted mb-4">Preenche os campos abaixo e clica em <strong>Gerar</strong> para pré-visualizar o teu site.</p>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex align-items-center gap-3">
+        <img src="~/css/img/logo.jpg" alt="Logo CodeMasters" style="height: 80px; width: auto;" />
+        <div>
+            <h1 class="mb-1">CodeMasters &#8212; Static Site Generator</h1>
+            <p class="text-muted mb-0">Preenche os campos abaixo e clica em <strong>Gerar</strong> para pré-visualizar o teu site.</p>
+        </div>
+    </div>
+    <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" id="themeToggle" />
+        <label class="form-check-label" for="themeToggle">
+            Tema Escuro
+        </label>
+    </div>
+</div>
 
 <!-- Mensagens de Erro e Sucesso -->
 <div id="errorMessages"></div>
@@ -96,11 +109,11 @@
             </div>
             <div class="mb-3">
                 <label for="siteImage" class="form-label">Imagem de Conteúdo</label>
-                @if (!string.IsNullOrWhiteSpace(landing.ImagePath))
+                @if (!string.IsNullOrWhiteSpace(landing.ImagePath) && landing.ImagePath != "null")
                 {
                     <div class="mb-2">
                         <img src="@landing.ImagePath" alt="Imagem atual"
-                             class="img-thumbnail" style="max-height: 150px;" />
+                             class="img-thumbnail" style="max-height: 150px;" onerror="this.style.display='none'" />
                         <small class="text-muted d-block mt-1">Imagem atual. Seleciona outra para substituir.</small>
                     </div>
                 }
@@ -112,6 +125,29 @@
                 </div>
             </div>
             <div class="mb-3">
+                <label for="siteDocument" class="form-label">Documento</label>
+                @if (!string.IsNullOrWhiteSpace(landing.DocumentPath))
+                {
+                    <div class="alert alert-info d-flex align-items-center gap-2 py-2 mb-2">
+                        <span>&#128196;</span>
+                        <span>Documento atual: <strong>@landing.DocumentName</strong></span>
+                        <small class="text-muted ms-1">(seleciona outro para substituir)</small>
+                    </div>
+                }
+                <input type="file" id="siteDocument" name="document" class="form-control"
+                       accept=".docx,.xlsx,.pdf,.txt,.csv,.pptx" />
+                <div id="docPreview" class="mt-2 d-none">
+                    <div class="alert alert-success d-flex align-items-center gap-2 py-2 mb-0">
+                        <span>&#128196;</span>
+                        <span>Selecionado: <strong id="docName"></strong></span>
+                        <small class="text-muted ms-1">— será guardado ao clicar Gerar</small>
+                    </div>
+                </div>
+                <small class="form-text text-muted mt-1 d-block">
+                    Formatos aceites: .docx, .xlsx, .pdf, .txt, .csv, .pptx
+                </small>
+            </div>
+            <div class="mb-3">
                 <label for="siteFooter" class="form-label">Rodapé</label>
                 <input type="text" id="siteFooter" class="form-control"
                        value="@landing.Footer" placeholder="Ex: Gerado com CodeMasters SSG" />
@@ -119,36 +155,9 @@
         </div>
     </div>
 
-    <!-- Documentos -->
-    <div class="card mb-3">
-        <div class="card-header fw-bold">Documentos</div>
-        <div class="card-body">
-            @if (!string.IsNullOrWhiteSpace(landing.DocumentPath))
-            {
-                <div class="alert alert-info d-flex align-items-center gap-2 py-2">
-                    <span>&#128196;</span>
-                    <span>Documento atual: <strong>@landing.DocumentName</strong></span>
-                    <small class="text-muted ms-1">(seleciona outro para substituir)</small>
-                </div>
-            }
-            <label for="siteDocument" class="form-label">Carregar documento</label>
-            <input type="file" id="siteDocument" name="document" class="form-control"
-                   accept=".docx,.xlsx,.pdf,.txt,.csv,.pptx" />
-            <div id="docPreview" class="mt-2 d-none">
-                <div class="alert alert-success d-flex align-items-center gap-2 py-2 mb-0">
-                    <span>&#128196;</span>
-                    <span>Selecionado: <strong id="docName"></strong></span>
-                    <small class="text-muted ms-1">— será guardado ao clicar Gerar</small>
-                </div>
-            </div>
-            <small class="form-text text-muted mt-1 d-block">
-                Formatos aceites: .docx, .xlsx, .pdf, .txt, .csv, .pptx
-            </small>
-        </div>
-    </div>
-
     <button type="submit" class="btn btn-primary px-4">Gerar</button>
 </form>
 
+<script src="~/js/notifications.js"></script>
 <script src="~/js/validation.js"></script>
 <script src="~/js/editor.js"></script>

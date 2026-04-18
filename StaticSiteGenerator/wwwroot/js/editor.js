@@ -7,6 +7,11 @@
  */
 
 /**
+ * Variável global para armazenar Base64 da imagem
+ */
+let currentImageBase64 = '';
+
+/**
  * Objeto com funções do editor
  */
 const Editor = {
@@ -15,6 +20,51 @@ const Editor = {
      */
     init: function() {
         this.setupEventListeners();
+        this.setupThemeToggle();
+        this.loadThemePreference();
+    },
+
+    /**
+     * Configura toggle de tema
+     */
+    setupThemeToggle: function() {
+        const themeToggle = document.getElementById('themeToggle');
+        if (themeToggle) {
+            themeToggle.addEventListener('change', (e) => this.handleThemeToggle(e));
+        }
+    },
+
+    /**
+     * Trata mudança de tema
+     * @param {event} event - Evento de mudança
+     */
+    handleThemeToggle: function(event) {
+        const isDark = event.target.checked;
+        if (isDark) {
+            document.body.classList.add('dark-theme');
+            localStorage.setItem('theme', 'dark');
+            Notifications.info('Tema escuro ativado');
+        } else {
+            document.body.classList.remove('dark-theme');
+            localStorage.setItem('theme', 'light');
+            Notifications.info('Tema claro ativado');
+        }
+    },
+
+    /**
+     * Carrega preferência de tema
+     */
+    loadThemePreference: function() {
+        const theme = localStorage.getItem('theme') || 'light';
+        const isDark = theme === 'dark';
+
+        if (isDark) {
+            document.body.classList.add('dark-theme');
+            const themeToggle = document.getElementById('themeToggle');
+            if (themeToggle) {
+                themeToggle.checked = true;
+            }
+        }
     },
 
     /**
@@ -78,21 +128,36 @@ const Editor = {
         // Validar tamanho (5MB)
         const validation = Validation.validateFileSize(file, 5);
         if (!validation.valid) {
-            alert(validation.error);
+            Notifications.error(validation.error);
             return;
         }
 
         // Validar tipo (image)
         const typeValidation = Validation.validateFileType(file, ['image/jpeg', 'image/png', 'image/gif', 'image/webp']);
         if (!typeValidation.valid) {
-            alert(typeValidation.error);
+            Notifications.error(typeValidation.error);
             return;
         }
 
         const reader = new FileReader();
-        reader.onload = function(e) {
-            document.getElementById('previewImg').src = e.target.result;
-            document.getElementById('imagePreview').classList.remove('d-none');
+        reader.onload = (e) => {
+            const previewImg = document.getElementById('previewImg');
+            const imagePreview = document.getElementById('imagePreview');
+
+            // Armazenar Base64 na variável global para ser incluído no JSON
+            currentImageBase64 = e.target.result;
+
+            if (previewImg) {
+                previewImg.src = e.target.result;
+            }
+
+            if (imagePreview) {
+                imagePreview.classList.remove('d-none');
+                // Força reflow para garantir que o CSS é aplicado
+                imagePreview.offsetHeight;
+            }
+
+            Notifications.success('Imagem carregada com sucesso (Base64 armazenada)');
         };
         reader.readAsDataURL(file);
     },
@@ -108,7 +173,7 @@ const Editor = {
         // Validar tamanho (20MB)
         const validation = Validation.validateFileSize(file, 20);
         if (!validation.valid) {
-            alert(validation.error);
+            Notifications.error(validation.error);
             return;
         }
 
@@ -116,12 +181,24 @@ const Editor = {
         const allowedTypes = ['application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/pdf', 'text/plain', 'text/csv', 'application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation'];
         const typeValidation = Validation.validateFileType(file, allowedTypes);
         if (!typeValidation.valid) {
-            alert(typeValidation.error);
+            Notifications.error(typeValidation.error);
             return;
         }
 
-        document.getElementById('docName').textContent = file.name;
-        document.getElementById('docPreview').classList.remove('d-none');
+        const docName = document.getElementById('docName');
+        const docPreview = document.getElementById('docPreview');
+
+        if (docName) {
+            docName.textContent = file.name;
+        }
+
+        if (docPreview) {
+            docPreview.classList.remove('d-none');
+            // Força reflow
+            docPreview.offsetHeight;
+        }
+
+        Notifications.success('Documento carregado com sucesso');
     },
 
     /**
@@ -135,12 +212,13 @@ const Editor = {
         const content = document.getElementById('siteContent').value;
         const footer = document.getElementById('siteFooter').value;
 
+        // Usar Base64 da imagem se existir, senão usar string vazia
         const landing = {
             title: title,
             subtitle: subtitle,
             theme: theme,
             content: content,
-            imagePath: document.getElementById('siteImage').value ? document.getElementById('siteImage').files[0]?.name : '',
+            imagePath: currentImageBase64 ? currentImageBase64 : '',
             documentPath: document.getElementById('siteDocument').value ? document.getElementById('siteDocument').files[0]?.name : '',
             documentName: document.getElementById('docName').textContent || '',
             footer: footer
