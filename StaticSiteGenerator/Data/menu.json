@@ -1,13 +1,5 @@
 [
   {
-    "title": "Início",
-    "link": "/"
-  },
-  {
-    "title": "google",
-    "link": "www.google.pt"
-  },
-  {
     "title": "GitHub",
     "link": "https://github.com/uab-lds-codemasters/ssg"
   },

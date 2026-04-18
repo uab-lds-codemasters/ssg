@@ -9,8 +9,14 @@
     var menuItems = JsonConvert.DeserializeObject<List<MenuItem>>(Model.MenuJson) ?? new List<MenuItem>();
 }
 
+<link rel="stylesheet" href="~/css/editor.css" />
+
 <h1 class="mb-1">CodeMasters &#8212; Static Site Generator</h1>
 <p class="text-muted mb-4">Preenche os campos abaixo e clica em <strong>Gerar</strong> para pré-visualizar o teu site.</p>
+
+<!-- Mensagens de Erro e Sucesso -->
+<div id="errorMessages"></div>
+<div id="successMessage" class="alert alert-success"></div>
 
 @if (!ViewData.ModelState.IsValid)
 {
@@ -31,7 +37,7 @@
     <div class="card mb-3">
         <div class="card-header fw-bold d-flex justify-content-between align-items-center">
             Menu de Navegação
-            <button type="button" class="btn btn-sm btn-outline-primary" onclick="adicionarItem()">+ Adicionar item</button>
+            <button type="button" class="btn btn-sm btn-outline-primary" onclick="Editor.adicionarItem()">+ Adicionar item</button>
         </div>
         <div class="card-body">
             <div class="row g-2 mb-1 text-muted small px-1">
@@ -53,7 +59,7 @@
                         </div>
                         <div class="col-auto">
                             <button type="button" class="btn btn-outline-danger"
-                                    onclick="removerItem(this)">&#10005;</button>
+                                    onclick="Editor.removerItem(this)">&#10005;</button>
                         </div>
                     </div>
                 }
@@ -144,65 +150,5 @@
     <button type="submit" class="btn btn-primary px-4">Gerar</button>
 </form>
 
-<script>
-    document.getElementById('siteDocument').addEventListener('change', function () {
-        const file = this.files[0];
-        if (!file) return;
-        document.getElementById('docName').textContent = file.name;
-        document.getElementById('docPreview').classList.remove('d-none');
-    });
-
-    document.getElementById('siteImage').addEventListener('change', function () {
-        const file = this.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            document.getElementById('previewImg').src = e.target.result;
-            document.getElementById('imagePreview').classList.remove('d-none');
-        };
-        reader.readAsDataURL(file);
-    });
-
-    function adicionarItem() {
-        const container = document.getElementById('menuItems');
-        const div = document.createElement('div');
-        div.className = 'row g-2 mb-2 menu-item';
-        div.innerHTML = `
-            <div class="col">
-                <input type="text" class="form-control menu-title" placeholder="Ex: Início" />
-            </div>
-            <div class="col">
-                <input type="text" class="form-control menu-link" placeholder="Ex: /" />
-            </div>
-            <div class="col-auto">
-                <button type="button" class="btn btn-outline-danger" onclick="removerItem(this)">&#10005;</button>
-            </div>`;
-        container.appendChild(div);
-    }
-
-    function removerItem(btn) {
-        btn.closest('.menu-item').remove();
-    }
-
-    document.getElementById('editorForm').addEventListener('submit', function () {
-        const landing = {
-            title:     document.getElementById('siteTitle').value,
-            subtitle:  document.getElementById('siteSubtitle').value,
-            theme:     document.getElementById('siteTheme').value,
-            content:   document.getElementById('siteContent').value,
-            imagePath:    '@landing.ImagePath',
-            documentPath: '@landing.DocumentPath',
-            documentName: '@landing.DocumentName',
-            footer:       document.getElementById('siteFooter').value
-        };
-        document.getElementById('landingJsonHidden').value = JSON.stringify(landing, null, 2);
-
-        const items = [];
-        document.querySelectorAll('.menu-item').forEach(row => {
-            const title = row.querySelector('.menu-title').value.trim();
-            const link  = row.querySelector('.menu-link').value.trim();
-            if (title || link) items.push({ title, link });
-        });
-        document.getElementById('menuJsonHidden').value = JSON.stringify(items, null, 2);
-    });
-</script>
+<script src="~/js/validation.js"></script>
+<script src="~/js/editor.js"></script>

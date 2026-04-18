@@ -1,0 +1,429 @@
+/*
+ * Unidade Curricular: 21179 - Laboratórios de Desenvolvimento de Software
+ * Grupo: Grupo 1 - CodeMasters
+ * Projeto: Static Site Generator com Json.NET
+ * Ficheiro: editor.css
+ * Descrição: Estilos CSS customizados para o editor de conteúdo.
+ */
+
+/* --- Variáveis de Cor --- */
+:root {
+    --primary-color: #1f4e79;
+    --primary-dark: #163a5a;
+    --primary-light: #e8f0fe;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #17a2b8;
+    --border-color: #dee2e6;
+    --text-muted: #6c757d;
+}
+
+/* --- Editor Principal --- */
+.editor-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* --- Cards --- */
+.card {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    transition: box-shadow 0.2s ease;
+    margin-bottom: 20px;
+}
+
+.card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid var(--border-color);
+    padding: 15px;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.card-body {
+    padding: 20px;
+}
+
+/* --- Títulos --- */
+h1 {
+    color: var(--primary-color);
+    margin-bottom: 10px;
+}
+
+.text-muted {
+    color: var(--text-muted);
+}
+
+/* --- Formulários --- */
+.form-label {
+    font-weight: 600;
+    color: #222;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+}
+
+.form-label .required {
+    color: var(--danger-color);
+    margin-left: 4px;
+    font-weight: bold;
+}
+
+.form-control,
+.form-select,
+textarea.form-control {
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 10px 12px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.form-control:focus,
+.form-select:focus,
+textarea.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(31, 78, 121, 0.25);
+    color: #222;
+}
+
+.form-control:disabled,
+.form-select:disabled {
+    background-color: #f8f9fa;
+    color: var(--text-muted);
+}
+
+/* --- Inputs de Arquivo --- */
+.form-control[type="file"] {
+    padding: 8px;
+    cursor: pointer;
+}
+
+.form-control[type="file"]::file-selector-button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    margin-right: 10px;
+}
+
+.form-control[type="file"]::file-selector-button:hover {
+    background-color: var(--primary-dark);
+}
+
+/* --- Preview de Imagem --- */
+#imagePreview,
+#docPreview {
+    margin-top: 12px;
+    padding: 12px;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+}
+
+.img-thumbnail {
+    border: 2px solid var(--border-color);
+    border-radius: 6px;
+    padding: 4px;
+    background-color: white;
+}
+
+/* --- Menu Items --- */
+.menu-item {
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background-color: #f8f9fa;
+    transition: all 0.2s ease;
+}
+
+.menu-item:hover {
+    background-color: #fff;
+    border-color: var(--primary-color);
+}
+
+.menu-item .form-control {
+    background-color: white;
+    font-size: 13px;
+    padding: 8px 10px;
+}
+
+/* --- Botões --- */
+.btn {
+    border-radius: 4px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    padding: 10px 16px;
+    font-size: 14px;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+.btn-primary:hover,
+.btn-primary:active {
+    background-color: var(--primary-dark);
+    border-color: var(--primary-dark);
+    color: white;
+    box-shadow: 0 2px 6px rgba(31, 78, 121, 0.3);
+}
+
+.btn-primary:disabled {
+    background-color: #ccc;
+    border-color: #ccc;
+    color: white;
+    opacity: 0.8;
+}
+
+.btn-outline-primary {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+.btn-outline-danger {
+    border-color: var(--danger-color);
+    color: var(--danger-color);
+    font-size: 12px;
+    padding: 6px 10px;
+}
+
+.btn-outline-danger:hover {
+    background-color: var(--danger-color);
+    border-color: var(--danger-color);
+    color: white;
+}
+
+/* --- Spinner de Loading --- */
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+    border-width: 0.15em;
+}
+
+/* --- Mensagens de Erro --- */
+#errorMessages {
+    border-left: 4px solid var(--danger-color);
+    margin-bottom: 20px;
+    display: none;
+}
+
+#errorMessages .alert {
+    margin-bottom: 0;
+}
+
+#errorMessages .error-message {
+    padding: 8px 0;
+    font-size: 14px;
+}
+
+#errorMessages .error-message:not(:last-child) {
+    border-bottom: 1px solid rgba(220, 53, 69, 0.2);
+    padding-bottom: 8px;
+}
+
+/* --- Mensagens de Sucesso --- */
+#successMessage {
+    border-left: 4px solid var(--success-color);
+    margin-bottom: 20px;
+    display: none;
+}
+
+/* --- Alertas --- */
+.alert {
+    border-radius: 4px;
+    padding: 12px 16px;
+    font-size: 14px;
+    margin-bottom: 16px;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    border: 1px solid #bee5eb;
+    color: #0c5460;
+}
+
+/* --- Grid de Campos --- */
+.row.g-2 {
+    margin-bottom: 12px;
+}
+
+.row.g-2 .col {
+    padding-right: 10px;
+}
+
+.row.g-2 .col-auto {
+    padding: 0;
+}
+
+/* --- Labels de Header --- */
+.row.g-2.mb-1.text-muted.small {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+/* --- Feedback Visual --- */
+.form-control.is-invalid {
+    border-color: var(--danger-color);
+    background-image: none;
+}
+
+.form-control.is-valid {
+    border-color: var(--success-color);
+    background-image: none;
+}
+
+/* --- Responsividade --- */
+@media (max-width: 768px) {
+    .editor-container {
+        padding: 10px;
+    }
+
+    .card {
+        margin-bottom: 15px;
+    }
+
+    .card-body {
+        padding: 15px;
+    }
+
+    .btn {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+
+    .btn-outline-danger {
+        padding: 4px 8px;
+    }
+
+    .row.g-2 .col {
+        min-width: 0;
+    }
+
+    .menu-item {
+        flex-direction: column;
+    }
+
+    .menu-item input {
+        width: 100%;
+        margin-bottom: 8px;
+    }
+
+    .menu-item .col-auto {
+        width: 100% !important;
+    }
+
+    .menu-item .btn {
+        width: 100%;
+    }
+}
+
+/* --- Animações --- */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.alert,
+#errorMessages,
+#successMessage {
+    animation: fadeIn 0.3s ease;
+}
+
+/* --- Tema Escuro (Futuro) --- */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --primary-color: #5a9fd4;
+        --text-muted: #a0a0a0;
+    }
+
+    .editor-container {
+        background-color: #2a2a2a;
+        color: #e0e0e0;
+    }
+
+    .card {
+        background-color: #333;
+        border-color: #444;
+    }
+
+    .card-header {
+        background-color: #3a3a3a;
+        border-color: #444;
+        color: #5a9fd4;
+    }
+
+    .card-body {
+        color: #e0e0e0;
+    }
+
+    .form-control,
+    .form-select,
+    textarea.form-control {
+        background-color: #3a3a3a;
+        border-color: #555;
+        color: #e0e0e0;
+    }
+
+    .form-control:focus {
+        background-color: #3a3a3a;
+        border-color: #5a9fd4;
+        color: #e0e0e0;
+    }
+
+    .menu-item {
+        background-color: #3a3a3a;
+        border-color: #555;
+    }
+
+    .menu-item:hover {
+        background-color: #404040;
+        border-color: #5a9fd4;
+    }
+
+    .menu-item .form-control {
+        background-color: #2a2a2a;
+        border-color: #555;
+        color: #e0e0e0;
+    }
+}
+
