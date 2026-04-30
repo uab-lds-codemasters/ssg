@@ -16,6 +16,64 @@ namespace StaticSiteGenerator.Controllers
 {
     public class SiteController : Controller
     {
+        private bool DadosValidos(string landingJson, string menuJson)
+        {
+            return !string.IsNullOrWhiteSpace(landingJson) && !string.IsNullOrWhiteSpace(menuJson);
+        }
+        private bool DadosDesserializados (string landingJson, string menuJson, 
+            out LandingPage? landingPage, out List<MenuItem>? menuItems)
+        {
+            landingPage = null;
+            menuItems = null;
+
+            try
+            {
+                landingPage = JsonConvert.DeserializeObject<LandingPage>(landingJson);
+                menuItems = JsonConvert.DeserializeObject<List<MenuItem>>(menuJson);
+
+                return landingPage != null && menuItems != null;
+            }
+            catch (JsonException)
+            {
+                return false;
+            }
+        }
+        private SiteEditorViewModel CriarModelViewParaErro(string landingJson, string menuJson)
+        {
+            return new SiteEditorViewModel
+            {
+                LandingJson = landingJson,
+                MenuJson = menuJson
+            };
+        }
+        public delegate void MostrarMensagemErro(string mensagem);
+        public event MostrarMensagemErro? AoOcorrerErro;
+        private string? _mensagemErro;
+        public SiteController()
+        {
+            AoOcorrerErro += GuardarMensagemErro;
+        }
+
+        private void GuardarMensagemErro (String mensagem)
+        {
+            _mensagemErro = mensagem ;
+        }
+       
+        private IActionResult RetornarErro (string mensagem, string landingPage, string menuJson)
+        {
+            AoOcorrerErro?.Invoke(mensagem);
+            ModelState.AddModelError("", _mensagemErro);
+            return View("Index", CriarModelViewParaErro(landingPage, menuJson));
+
+        }
+        public void SalvarDados(string landingJson, string menuJson)
+        {
+            string dataFolder = Path.Combine(Directory.GetCurrentDirectory(), "Data");
+            Directory.CreateDirectory(dataFolder);
+
+            System.IO.File.WriteAllText(Path.Combine(dataFolder, "landingPage.json"), landingJson);
+            System.IO.File.WriteAllText(Path.Combine(dataFolder, "menu.json"), menuJson);
+        }
         public IActionResult Index()
         {
             string landingPath = Path.Combine(Directory.GetCurrentDirectory(), "Data", "landingPage.json");
@@ -41,14 +99,18 @@ namespace StaticSiteGenerator.Controllers
         [HttpPost]
         public IActionResult Preview(string landingJson, string menuJson)
         {
-            LandingPage? landingPage = JsonConvert.DeserializeObject<LandingPage>(landingJson);
-            List<MenuItem>? menuItems = JsonConvert.DeserializeObject<List<MenuItem>>(menuJson);
+            if(!DadosValidos(landingJson, menuJson))
+            {
+                RetornarErro("Os dados não podem ser vazios", landingJson, menuJson);
+            }
 
-            string dataFolder = Path.Combine(Directory.GetCurrentDirectory(), "Data");
-            Directory.CreateDirectory(dataFolder);
+            if(!DadosDesserializados(landingJson, menuJson, out LandingPage? landingPage, out List<MenuItem>? menuItems))
+            {
+                RetornarErro("Ficheiros Json inválido", landingJson, menuJson);
+            }
 
-            System.IO.File.WriteAllText(Path.Combine(dataFolder, "landingPage.json"), landingJson);
-            System.IO.File.WriteAllText(Path.Combine(dataFolder, "menu.json"), menuJson);
+            SalvarDados(landingJson, menuJson);
+
 
             SiteEditorViewModel viewModel = new SiteEditorViewModel
             {
