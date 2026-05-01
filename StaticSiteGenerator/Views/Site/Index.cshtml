@@ -4,18 +4,269 @@
     ViewData["Title"] = "Editor JSON";
 }
 
-<h1>Editor JSON</h1>
+@if (TempData["Sucesso"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Sucesso"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+    </div>
+}
 
-<form action="/Site/Preview" method="post" target="_blank">
-    <div>
-        <label for="landingJson">Landing Page JSON</label>
-        <textarea id="landingJson" name="landingJson" rows="15" cols="80">@Model.LandingJson</textarea>
+@if (TempData["Erro"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["Erro"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+    </div>
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">Editor JSON</h1>
+    <span class="badge bg-secondary">Static Site Generator</span>
+</div>
+
+<form action="/Site/Preview" method="post" target="_blank" id="editorForm">
+    <div class="row g-4">
+
+        @* Landing Page JSON *@
+        <div class="col-lg-7">
+            <div class="card shadow-sm h-100">
+                <div class="card-header d-flex justify-content-between align-items-center fw-semibold">
+                    <span>Landing Page JSON</span>
+                    <label class="btn btn-outline-secondary btn-sm mb-0">
+                        &#8679; Carregar JSON
+                        <input type="file" id="uploadLanding" accept=".json,application/json" class="d-none" />
+                    </label>
+                </div>
+                <div class="card-body d-flex flex-column gap-3">
+                    <textarea id="landingJson"
+                              name="landingJson"
+                              class="form-control editor-textarea"
+                              rows="13"
+                              spellcheck="false">@Model.LandingJson</textarea>
+
+                    <div>
+                        <label for="themeSelect" class="form-label fw-semibold mb-1">Tema visual</label>
+                        <select id="themeSelect" class="form-select">
+                            <option value="default.css">Default (fundo branco)</option>
+                            <option value="light.css">Light (cinzento claro)</option>
+                            <option value="dark.css">Dark (fundo escuro)</option>
+                        </select>
+                        <div class="form-text">Altera automaticamente o campo "theme" no JSON acima.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* Menu JSON *@
+        <div class="col-lg-5">
+            <div class="card shadow-sm h-100">
+                <div class="card-header d-flex justify-content-between align-items-center fw-semibold">
+                    <span>Menu JSON</span>
+                    <label class="btn btn-outline-secondary btn-sm mb-0">
+                        &#8679; Carregar JSON
+                        <input type="file" id="uploadMenu" accept=".json,application/json" class="d-none" />
+                    </label>
+                </div>
+                <div class="card-body">
+                    <textarea id="menuJson"
+                              name="menuJson"
+                              class="form-control editor-textarea"
+                              rows="16"
+                              spellcheck="false">@Model.MenuJson</textarea>
+                </div>
+            </div>
+        </div>
+
     </div>
 
-    <div>
-        <label for="menuJson">Menu JSON</label>
-        <textarea id="menuJson" name="menuJson" rows="15" cols="80">@Model.MenuJson</textarea>
+    @* Upload de imagem *@
+    <div class="row g-4 mt-1">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header fw-semibold">Imagem de destaque</div>
+                <div class="card-body">
+                    <div class="row align-items-center g-3">
+                        <div class="col-auto">
+                            <label class="btn btn-outline-primary" for="uploadImagem">
+                                &#8679; Escolher imagem
+                            </label>
+                            <input type="file" id="uploadImagem" accept="image/*" class="d-none" />
+                        </div>
+                        <div class="col">
+                            <span id="imagemNome" class="text-muted fst-italic">Nenhuma imagem selecionada</span>
+                        </div>
+                    </div>
+                    <div id="imagemPreviewBox" class="mt-3 d-none">
+                        <img id="imagemPreview" src="" alt="Pré-visualização" class="img-fluid rounded shadow-sm" style="max-height: 220px;" />
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <button type="submit">Gerar</button>
+    <div class="mt-4 d-flex align-items-center gap-3">
+        <button type="submit" class="btn btn-primary px-4">
+            Gerar pré-visualização
+        </button>
+        <div id="validationMsg" class="d-none"></div>
+    </div>
 </form>
+
+@section Scripts {
+<script>
+    const themeSelect    = document.getElementById('themeSelect');
+    const landingTextarea = document.getElementById('landingJson');
+    const menuTextarea   = document.getElementById('menuJson');
+    const validationMsg  = document.getElementById('validationMsg');
+
+    // Validação visual das textareas
+    function markField(textarea, valid, msg) {
+        textarea.classList.toggle('is-invalid', !valid);
+        textarea.classList.toggle('is-valid',   valid);
+
+        // Feedback abaixo do campo
+        let fb = textarea.nextElementSibling;
+        if (!fb || !fb.classList.contains('invalid-feedback')) {
+            fb = document.createElement('div');
+            fb.className = 'invalid-feedback';
+            textarea.parentNode.insertBefore(fb, textarea.nextSibling);
+        }
+        fb.textContent = valid ? '' : msg;
+    }
+
+    function clearMark(textarea) {
+        textarea.classList.remove('is-invalid', 'is-valid');
+        const fb = textarea.nextElementSibling;
+        if (fb && fb.classList.contains('invalid-feedback')) fb.textContent = '';
+    }
+
+    function validateLandingJson() {
+        const raw = landingTextarea.value.trim();
+        if (!raw) { clearMark(landingTextarea); return null; }
+        try {
+            const data = JSON.parse(raw);
+            if (typeof data !== 'object' || Array.isArray(data))
+                throw new Error('Deve ser um objecto JSON { ... }');
+            if (!data.title || !data.title.trim())
+                throw new Error('Campo "title" em falta ou vazio');
+            markField(landingTextarea, true, '');
+            return data;
+        } catch (e) {
+            markField(landingTextarea, false, 'Landing Page JSON inválido: ' + e.message);
+            return null;
+        }
+    }
+
+    function validateMenuJson() {
+        const raw = menuTextarea.value.trim();
+        if (!raw) { clearMark(menuTextarea); return null; }
+        try {
+            const data = JSON.parse(raw);
+            if (!Array.isArray(data))
+                throw new Error('Deve ser um array JSON [ ... ]');
+            markField(menuTextarea, true, '');
+            return data;
+        } catch (e) {
+            markField(menuTextarea, false, 'Menu JSON inválido: ' + e.message);
+            return null;
+        }
+    }
+
+    // Valida em tempo real enquanto o utilizador escreve
+    landingTextarea.addEventListener('input', () => { validateLandingJson(); syncThemeFromJson(); });
+    menuTextarea.addEventListener('input', validateMenuJson);
+
+    // Validação antes de submeter o formulário
+    document.getElementById('editorForm').addEventListener('submit', function (e) {
+        const landing = validateLandingJson();
+        const menu    = validateMenuJson();
+        const erros   = [];
+
+        if (landing === null) erros.push('Landing Page JSON inválido ou em falta');
+        if (menu    === null) erros.push('Menu JSON inválido ou em falta');
+
+        if (erros.length > 0) {
+            e.preventDefault();
+            validationMsg.className = 'alert alert-danger py-2 px-3 mb-0 small';
+            validationMsg.innerHTML = '<strong>Corrija os erros antes de continuar:</strong><ul class="mb-0 mt-1">'
+                + erros.map(m => `<li>${m}</li>`).join('') + '</ul>';
+        } else {
+            validationMsg.className = 'd-none';
+        }
+    });
+
+    // Seletor de tema — sincroniza com o campo "theme" no JSON
+    function syncThemeFromJson() {
+        try {
+            const data = JSON.parse(landingTextarea.value);
+            if (data.theme && themeSelect.querySelector(`option[value="${data.theme}"]`)) {
+                themeSelect.value = data.theme;
+            }
+        } catch (e) {}
+    }
+
+    function syncThemeToJson() {
+        try {
+            const data = JSON.parse(landingTextarea.value);
+            data.theme = themeSelect.value;
+            landingTextarea.value = JSON.stringify(data, null, 2);
+        } catch (e) {}
+    }
+
+    syncThemeFromJson();
+    themeSelect.addEventListener('change', syncThemeToJson);
+
+    // Upload de ficheiro JSON para Landing Page
+    document.getElementById('uploadLanding').addEventListener('change', function () {
+        const file = this.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            try {
+                const parsed = JSON.parse(e.target.result);
+                landingTextarea.value = JSON.stringify(parsed, null, 2);
+                syncThemeFromJson();
+                validateLandingJson();
+            } catch {
+                markField(landingTextarea, false, 'Ficheiro inválido: o conteúdo não é JSON válido.');
+            }
+        };
+        reader.readAsText(file);
+        this.value = '';
+    });
+
+    // Upload de ficheiro JSON para Menu
+    document.getElementById('uploadMenu').addEventListener('change', function () {
+        const file = this.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            try {
+                const parsed = JSON.parse(e.target.result);
+                menuTextarea.value = JSON.stringify(parsed, null, 2);
+                validateMenuJson();
+            } catch {
+                markField(menuTextarea, false, 'Ficheiro inválido: o conteúdo não é JSON válido.');
+            }
+        };
+        reader.readAsText(file);
+        this.value = '';
+    });
+
+    // Upload de imagem — pré-visualização
+    document.getElementById('uploadImagem').addEventListener('change', function () {
+        const file = this.files[0];
+        if (!file) return;
+        document.getElementById('imagemNome').textContent = file.name;
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            const preview = document.getElementById('imagemPreview');
+            const box     = document.getElementById('imagemPreviewBox');
+            preview.src = e.target.result;
+            box.classList.remove('d-none');
+        };
+        reader.readAsDataURL(file);
+    });
+</script>
+}

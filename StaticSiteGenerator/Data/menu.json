@@ -1,26 +1,12 @@
 [
+  { "title": "Início", "link": "/" },
+  { "title": "Blog", "link": "/about" },
   {
-    "title": "Início",
-    "link": "/"
+    "title": "Links",
+    "children": [
+      { "title": "Google", "link": "https://www.google.pt" },
+      { "title": "Moodle", "link": "https://elearning.uab.pt/" }
+    ]
   },
-{
-    "title": "Blog",
-    "link": "/about"
-  },
-
-  {
-    "title": "Teste",
-    "link": "/about"
-  },
-
-
-  {
-    "title": "Teste 2",
-    "link": "/about"
-  },
-  
-  {
-    "title": "Sobre",
-    "link": "/about"
-  }
+  { "title": "Sobre", "link": "/about" }
 ]
