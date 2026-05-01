@@ -9,8 +9,27 @@
     var menuItems = JsonConvert.DeserializeObject<List<MenuItem>>(Model.MenuJson) ?? new List<MenuItem>();
 }
 
-<h1 class="mb-1">CodeMasters &#8212; Static Site Generator</h1>
-<p class="text-muted mb-4">Preenche os campos abaixo e clica em <strong>Gerar</strong> para pré-visualizar o teu site.</p>
+<link rel="stylesheet" href="~/css/editor.css" />
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex align-items-center gap-3">
+        <img src="~/css/img/logo.jpg" alt="Logo CodeMasters" style="height: 80px; width: auto;" />
+        <div>
+            <h1 class="mb-1">CodeMasters &#8212; Static Site Generator</h1>
+            <p class="text-muted mb-0">Preenche os campos abaixo e clica em <strong>Gerar</strong> para pré-visualizar o teu site.</p>
+        </div>
+    </div>
+    <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" id="themeToggle" />
+        <label class="form-check-label" for="themeToggle">
+            Tema Escuro
+        </label>
+    </div>
+</div>
+
+<!-- Mensagens de Erro e Sucesso -->
+<div id="errorMessages"></div>
+<div id="successMessage" class="alert alert-success"></div>
 
 @if (!ViewData.ModelState.IsValid)
 {
@@ -31,7 +50,7 @@
     <div class="card mb-3">
         <div class="card-header fw-bold d-flex justify-content-between align-items-center">
             Menu de Navegação
-            <button type="button" class="btn btn-sm btn-outline-primary" onclick="adicionarItem()">+ Adicionar item</button>
+            <button type="button" class="btn btn-sm btn-outline-primary" onclick="Editor.adicionarItem()">+ Adicionar item</button>
         </div>
         <div class="card-body">
             <div class="row g-2 mb-1 text-muted small px-1">
@@ -53,7 +72,7 @@
                         </div>
                         <div class="col-auto">
                             <button type="button" class="btn btn-outline-danger"
-                                    onclick="removerItem(this)">&#10005;</button>
+                                    onclick="Editor.removerItem(this)">&#10005;</button>
                         </div>
                     </div>
                 }
@@ -90,11 +109,11 @@
             </div>
             <div class="mb-3">
                 <label for="siteImage" class="form-label">Imagem de Conteúdo</label>
-                @if (!string.IsNullOrWhiteSpace(landing.ImagePath))
+                @if (!string.IsNullOrWhiteSpace(landing.ImagePath) && landing.ImagePath != "null")
                 {
                     <div class="mb-2">
                         <img src="@landing.ImagePath" alt="Imagem atual"
-                             class="img-thumbnail" style="max-height: 150px;" />
+                             class="img-thumbnail" style="max-height: 150px;" onerror="this.style.display='none'" />
                         <small class="text-muted d-block mt-1">Imagem atual. Seleciona outra para substituir.</small>
                     </div>
                 }
@@ -106,6 +125,29 @@
                 </div>
             </div>
             <div class="mb-3">
+                <label for="siteDocument" class="form-label">Documento</label>
+                @if (!string.IsNullOrWhiteSpace(landing.DocumentPath))
+                {
+                    <div class="alert alert-info d-flex align-items-center gap-2 py-2 mb-2">
+                        <span>&#128196;</span>
+                        <span>Documento atual: <strong>@landing.DocumentName</strong></span>
+                        <small class="text-muted ms-1">(seleciona outro para substituir)</small>
+                    </div>
+                }
+                <input type="file" id="siteDocument" name="document" class="form-control"
+                       accept=".docx,.xlsx,.pdf,.txt,.csv,.pptx" />
+                <div id="docPreview" class="mt-2 d-none">
+                    <div class="alert alert-success d-flex align-items-center gap-2 py-2 mb-0">
+                        <span>&#128196;</span>
+                        <span>Selecionado: <strong id="docName"></strong></span>
+                        <small class="text-muted ms-1">— será guardado ao clicar Gerar</small>
+                    </div>
+                </div>
+                <small class="form-text text-muted mt-1 d-block">
+                    Formatos aceites: .docx, .xlsx, .pdf, .txt, .csv, .pptx
+                </small>
+            </div>
+            <div class="mb-3">
                 <label for="siteFooter" class="form-label">Rodapé</label>
                 <input type="text" id="siteFooter" class="form-control"
                        value="@landing.Footer" placeholder="Ex: Gerado com CodeMasters SSG" />
@@ -113,96 +155,9 @@
         </div>
     </div>
 
-    <!-- Documentos -->
-    <div class="card mb-3">
-        <div class="card-header fw-bold">Documentos</div>
-        <div class="card-body">
-            @if (!string.IsNullOrWhiteSpace(landing.DocumentPath))
-            {
-                <div class="alert alert-info d-flex align-items-center gap-2 py-2">
-                    <span>&#128196;</span>
-                    <span>Documento atual: <strong>@landing.DocumentName</strong></span>
-                    <small class="text-muted ms-1">(seleciona outro para substituir)</small>
-                </div>
-            }
-            <label for="siteDocument" class="form-label">Carregar documento</label>
-            <input type="file" id="siteDocument" name="document" class="form-control"
-                   accept=".docx,.xlsx,.pdf,.txt,.csv,.pptx" />
-            <div id="docPreview" class="mt-2 d-none">
-                <div class="alert alert-success d-flex align-items-center gap-2 py-2 mb-0">
-                    <span>&#128196;</span>
-                    <span>Selecionado: <strong id="docName"></strong></span>
-                    <small class="text-muted ms-1">— será guardado ao clicar Gerar</small>
-                </div>
-            </div>
-            <small class="form-text text-muted mt-1 d-block">
-                Formatos aceites: .docx, .xlsx, .pdf, .txt, .csv, .pptx
-            </small>
-        </div>
-    </div>
-
     <button type="submit" class="btn btn-primary px-4">Gerar</button>
 </form>
 
-<script>
-    document.getElementById('siteDocument').addEventListener('change', function () {
-        const file = this.files[0];
-        if (!file) return;
-        document.getElementById('docName').textContent = file.name;
-        document.getElementById('docPreview').classList.remove('d-none');
-    });
-
-    document.getElementById('siteImage').addEventListener('change', function () {
-        const file = this.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            document.getElementById('previewImg').src = e.target.result;
-            document.getElementById('imagePreview').classList.remove('d-none');
-        };
-        reader.readAsDataURL(file);
-    });
-
-    function adicionarItem() {
-        const container = document.getElementById('menuItems');
-        const div = document.createElement('div');
-        div.className = 'row g-2 mb-2 menu-item';
-        div.innerHTML = `
-            <div class="col">
-                <input type="text" class="form-control menu-title" placeholder="Ex: Início" />
-            </div>
-            <div class="col">
-                <input type="text" class="form-control menu-link" placeholder="Ex: /" />
-            </div>
-            <div class="col-auto">
-                <button type="button" class="btn btn-outline-danger" onclick="removerItem(this)">&#10005;</button>
-            </div>`;
-        container.appendChild(div);
-    }
-
-    function removerItem(btn) {
-        btn.closest('.menu-item').remove();
-    }
-
-    document.getElementById('editorForm').addEventListener('submit', function () {
-        const landing = {
-            title:     document.getElementById('siteTitle').value,
-            subtitle:  document.getElementById('siteSubtitle').value,
-            theme:     document.getElementById('siteTheme').value,
-            content:   document.getElementById('siteContent').value,
-            imagePath:    '@landing.ImagePath',
-            documentPath: '@landing.DocumentPath',
-            documentName: '@landing.DocumentName',
-            footer:       document.getElementById('siteFooter').value
-        };
-        document.getElementById('landingJsonHidden').value = JSON.stringify(landing, null, 2);
-
-        const items = [];
-        document.querySelectorAll('.menu-item').forEach(row => {
-            const title = row.querySelector('.menu-title').value.trim();
-            const link  = row.querySelector('.menu-link').value.trim();
-            if (title || link) items.push({ title, link });
-        });
-        document.getElementById('menuJsonHidden').value = JSON.stringify(items, null, 2);
-    });
-</script>
+<script src="~/js/notifications.js"></script>
+<script src="~/js/validation.js"></script>
+<script src="~/js/editor.js"></script>

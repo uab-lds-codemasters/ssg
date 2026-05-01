@@ -32,7 +32,7 @@
         .btn-tema.ativo { opacity: 1; background: rgba(255,255,255,0.25); border-color: rgba(255,255,255,0.8); font-weight: bold; }
     </style>
 </head>
-<body>
+<body data-tema="@temaAtual">
     <nav style="justify-content: space-between;">
         <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
             @foreach (var item in Model.MenuItems)
@@ -41,15 +41,20 @@
             }
         </div>
         <div class="nav-temas">
-<a href="#" class="btn-tema" id="btn-default" onclick="mudarTema('default.css'); return false;">Default</a>
-            <a href="#" class="btn-tema" id="btn-dark"    onclick="mudarTema('dark.css');    return false;">Dark</a>
-            <a href="#" class="btn-tema" id="btn-light"   onclick="mudarTema('light.css');   return false;">Light</a>
+            <a href="#" class="btn-tema" id="btn-default" onclick="Preview.mudarTema('default.css'); return false;">Default</a>
+            <a href="#" class="btn-tema" id="btn-dark"    onclick="Preview.mudarTema('dark.css');    return false;">Dark</a>
+            <a href="#" class="btn-tema" id="btn-light"   onclick="Preview.mudarTema('light.css');   return false;">Light</a>
         </div>
     </nav>
 
     <header>
-        <h1>@Model.LandingPage.Title</h1>
-        <p class="subtitle">@Model.LandingPage.Subtitle</p>
+        <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
+            <img src="~/css/img/logo.jpg" alt="Logo CodeMasters" style="height: 80px; width: auto; flex-shrink: 0;" />
+            <div style="text-align: center; flex: 1;">
+                <h1 style="margin-bottom: 4px;">@Model.LandingPage.Title</h1>
+                <p class="subtitle" style="margin: 0;">@Model.LandingPage.Subtitle</p>
+            </div>
+        </div>
     </header>
 
     <main>
@@ -90,58 +95,6 @@
         <p>@(string.IsNullOrWhiteSpace(Model.LandingPage.Footer) ? "Gerado com CodeMasters SSG" : Model.LandingPage.Footer)</p>
     </footer>
 
-    <script>
-        var temaAtual = '@temaAtual';
-
-        function mudarTema(tema) {
-            document.getElementById('temaCSS').href = '/css/' + tema;
-            temaAtual = tema;
-            document.querySelectorAll('.btn-tema').forEach(b => b.classList.remove('ativo'));
-            var id = 'btn-' + tema.replace('.css', '');
-            var btn = document.getElementById(id);
-            if (btn) btn.classList.add('ativo');
-        }
-
-        // Marca o tema ativo ao carregar
-        mudarTema(temaAtual);
-
-        // Todos os links do menu abrem no iframe; "/" volta ao topo da preview
-        document.querySelectorAll('.nav-link-menu').forEach(function(link) {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                var href = this.getAttribute('href');
-                var frame = document.getElementById('conteudo-frame');
-                var container = document.getElementById('frame-container');
-                var aviso = document.getElementById('frame-aviso');
-                var linkNovaAba = document.getElementById('link-nova-aba');
-
-                // "/" ou "#" = página inicial = a própria preview
-                if (href === '/' || href === '#' || href === '') {
-                    container.style.display = 'none';
-                    frame.src = '';
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                    return;
-                }
-
-                // Outros links: carrega no iframe
-                container.style.display = 'block';
-                aviso.style.display = 'none';
-                frame.src = href;
-                linkNovaAba.href = href;
-
-                // Verifica se foi bloqueado após carregar
-                frame.onload = function() {
-                    try {
-                        var doc = frame.contentDocument || frame.contentWindow.document;
-                        if (!doc || doc.body === null || doc.body.innerHTML === '') {
-                            aviso.style.display = 'flex';
-                        }
-                    } catch(err) {
-                        aviso.style.display = 'flex';
-                    }
-                };
-            });
-        });
-    </script>
+    <script src="~/js/preview.js"></script>
 </body>
 </html>
