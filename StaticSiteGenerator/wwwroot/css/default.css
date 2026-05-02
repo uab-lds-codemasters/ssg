@@ -3,22 +3,76 @@
  * Grupo: Grupo 1 - CodeMasters
  * Projeto: Static Site Generator com Json.NET
  * Ficheiro: default.css
- * Descrição: Tema CSS por defeito do site gerado.
+ * Descrição: Tema CSS por defeito — corporativo branco/azul naval.
  */
 
-body {
-    font-family: Arial, sans-serif;
-    margin: 40px;
-    background-color: #ffffff;
-    color: #222222;
+:root {
+    --color-bg:        #ffffff;
+    --color-surface:   #f4f6f9;
+    --color-border:    #cdd6e0;
+    --color-text:      #1a2533;
+    --color-text-muted:#5a6a7a;
+    --color-heading:   #1a3a5c;
+    --color-accent:    #1e56a0;
+    --color-accent-hv: #163d7a;
+    --color-link:      #1e56a0;
+    --font-base: 'Segoe UI', Arial, sans-serif;
 }
 
-h1 {
-    color: #1f4e79;
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+    font-family: var(--font-base);
+    font-size: 1rem;
+    line-height: 1.65;
+    margin: 0;
+    padding: 2.5rem 3rem;
+    background-color: var(--color-bg);
+    color: var(--color-text);
 }
+
+h1, h2, h3, h4 {
+    color: var(--color-heading);
+    font-weight: 600;
+    margin-top: 0;
+    letter-spacing: -0.01em;
+}
+
+h1 { font-size: 1.9rem; border-bottom: 2px solid var(--color-border); padding-bottom: 0.5rem; margin-bottom: 1.25rem; }
+h2 { font-size: 1.4rem; }
+h3 { font-size: 1.15rem; }
+
+p { margin: 0 0 1rem; color: var(--color-text); }
 
 a {
-    margin-right: 15px;
+    color: var(--color-link);
     text-decoration: none;
-    color: #1f4e79;
+    margin-right: 15px;
+    font-weight: 500;
+    transition: color 0.15s;
+}
+a:hover { color: var(--color-accent-hv); text-decoration: underline; }
+
+hr {
+    border: none;
+    border-top: 1px solid var(--color-border);
+    margin: 1.5rem 0;
+}
+
+blockquote {
+    border-left: 3px solid var(--color-accent);
+    margin: 1rem 0;
+    padding: 0.5rem 1rem;
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    border-radius: 0 4px 4px 0;
+}
+
+code {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 3px;
+    padding: 0.1em 0.35em;
+    font-size: 0.88em;
+    color: var(--color-heading);
 }
