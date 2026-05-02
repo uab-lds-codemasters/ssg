@@ -13,27 +13,35 @@ var builder = WebApplication.CreateBuilder(new WebApplicationOptions
     WebRootPath = "wwwroot"
 });
 
-// Adiciona suporte a controllers e views
+// Adicionar suporte a controllers e views
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
 // Configuração do pipeline HTTP
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
 {
+    // Em desenvolvimento: mostrar página de erros detalhada
+    app.UseDeveloperExceptionPage();
+}
+else
+{
+    // Em produção: redirecionar para página de erro personalizada
     app.UseExceptionHandler("/Site/Error");
     app.UseHsts();
 }
 
-// Não temos HTTPS configurado localmente, fica comentado
+// HTTPS não está configurado para ambiente local de desenvolvimento
+// Para produção, descomentar a linha abaixo e configurar certificado SSL
 // app.UseHttpsRedirection();
 
-// Ativa os ficheiros estáticos da pasta wwwroot
+// Ativar ficheiros estáticos da pasta wwwroot (CSS, JS, imagens)
 app.UseStaticFiles();
 
 app.UseRouting();
 app.UseAuthorization();
 
+// Caminho padrão: controller=Site, action=Index
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Site}/{action=Index}/{id?}");

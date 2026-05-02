@@ -9,9 +9,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using StaticSiteGenerator.Models;
-using System.Collections.Generic;
-using System.Data;
-using System.IO;
 
 namespace StaticSiteGenerator.Controllers
 {

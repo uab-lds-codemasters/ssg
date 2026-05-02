@@ -3,7 +3,7 @@
  * Grupo: Grupo 1 - CodeMasters
  * Projeto: Static Site Generator com Json.NET
  * Ficheiro: validation.js
- * Descrição: Validações robustas do lado cliente para o formulário do editor.
+ * Descrição: Validações do lado cliente para o formulário do editor.
  */
 
 /**
@@ -55,6 +55,31 @@ const Validation = {
             return { valid: false, error: `${fieldName} é obrigatório` };
         }
         return { valid: true, error: null };
+    },
+
+    /**
+     * Valida conteúdo da página (comprimento)
+     * @param {string} content - Conteúdo da página
+     * @returns {object} { valid: boolean, error: string, warning: string }
+     */
+    validateContent: function(content) {
+        if (!content || content.trim() === '') {
+            return { 
+                valid: true, 
+                error: null,
+                warning: 'Site será gerado sem conteúdo principal'
+            };
+        }
+
+        if (content.length > 50000) {
+            return { 
+                valid: false, 
+                error: 'Conteúdo muito longo (máximo: 50.000 caracteres)',
+                warning: null
+            };
+        }
+
+        return { valid: true, error: null, warning: null };
     },
 
     /**
@@ -120,12 +145,14 @@ const Validation = {
      * Valida página inteira
      * @param {string} title - Título
      * @param {string} subtitle - Subtítulo
+     * @param {string} content - Conteúdo da página
      * @param {string} landingJson - JSON da página
      * @param {string} menuJson - JSON do menu
-     * @returns {object} { valid: boolean, errors: array }
+     * @returns {object} { valid: boolean, errors: array, warnings: array }
      */
-    validateForm: function(title, subtitle, landingJson, menuJson) {
+    validateForm: function(title, subtitle, content, landingJson, menuJson) {
         const errors = [];
+        const warnings = [];
 
         // Validar campos obrigatórios
         const titleValidation = this.validateRequired(title, 'Título');
@@ -136,6 +163,15 @@ const Validation = {
         const subtitleValidation = this.validateRequired(subtitle, 'Subtítulo');
         if (!subtitleValidation.valid) {
             errors.push(subtitleValidation.error);
+        }
+
+        // Validar conteúdo
+        const contentValidation = this.validateContent(content);
+        if (!contentValidation.valid) {
+            errors.push(contentValidation.error);
+        }
+        if (contentValidation.warning) {
+            warnings.push(contentValidation.warning);
         }
 
         // Validar JSON
@@ -162,9 +198,15 @@ const Validation = {
             }
         }
 
+        // Mostrar avisos (não bloqueiam submit)
+        if (warnings.length > 0) {
+            warnings.forEach(w => Notifications.warning(w));
+        }
+
         return {
             valid: errors.length === 0,
-            errors: errors
+            errors: errors,
+            warnings: warnings
         };
     },
 

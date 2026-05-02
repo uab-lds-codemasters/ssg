@@ -85,6 +85,42 @@ const Editor = {
         if (documentInput) {
             documentInput.addEventListener('change', (e) => this.handleDocumentChange(e));
         }
+
+        // Contador de caracteres para conteúdo
+        const contentTextarea = document.getElementById('siteContent');
+        const contentCounter = document.getElementById('contentCounter');
+        if (contentTextarea && contentCounter) {
+            // Atualizar ao carregar
+            this.updateContentCounter(contentTextarea, contentCounter);
+
+            // Atualizar ao digitar
+            contentTextarea.addEventListener('input', () => {
+                this.updateContentCounter(contentTextarea, contentCounter);
+            });
+        }
+    },
+
+    /**
+     * Atualiza contador de caracteres do conteúdo
+     * @param {element} textarea - Elemento textarea
+     * @param {element} counter - Elemento do contador
+     */
+    updateContentCounter: function(textarea, counter) {
+        const length = textarea.value.length;
+        const maxLength = 50000;
+        counter.textContent = `${length.toLocaleString('pt-PT')} / ${maxLength.toLocaleString('pt-PT')} caracteres`;
+
+        // Mudar cor se estiver perto do limite
+        if (length > maxLength * 0.9) {
+            counter.classList.add('text-danger');
+            counter.classList.remove('text-warning', 'text-muted');
+        } else if (length > maxLength * 0.75) {
+            counter.classList.add('text-warning');
+            counter.classList.remove('text-danger', 'text-muted');
+        } else {
+            counter.classList.add('text-muted');
+            counter.classList.remove('text-danger', 'text-warning');
+        }
     },
 
     /**
@@ -115,6 +151,65 @@ const Editor = {
      */
     removerItem: function(btn) {
         btn.closest('.menu-item').remove();
+    },
+
+    /**
+     * Limpa todos os campos do formulário
+     */
+    limparSelecao: function() {
+        // Confirmar ação
+        if (!confirm('Tem a certeza que deseja limpar todos os campos? Esta ação não pode ser desfeita.')) {
+            return;
+        }
+
+        // Limpar campos da configuração
+        document.getElementById('siteTitle').value = '';
+        document.getElementById('siteSubtitle').value = '';
+        document.getElementById('siteTheme').selectedIndex = 0;
+        document.getElementById('siteContent').value = '';
+        document.getElementById('siteFooter').value = '';
+
+        // Limpar imagem
+        const imageInput = document.getElementById('siteImage');
+        if (imageInput) {
+            imageInput.value = '';
+        }
+        const imagePreview = document.getElementById('imagePreview');
+        if (imagePreview) {
+            imagePreview.classList.add('d-none');
+        }
+        // Esconder imagem atual carregada do servidor
+        const currentImageDisplay = document.getElementById('currentImageDisplay');
+        if (currentImageDisplay) {
+            currentImageDisplay.style.display = 'none';
+        }
+        currentImageBase64 = '';
+
+        // Limpar documento
+        const documentInput = document.getElementById('siteDocument');
+        if (documentInput) {
+            documentInput.value = '';
+        }
+        const docPreview = document.getElementById('docPreview');
+        if (docPreview) {
+            docPreview.classList.add('d-none');
+        }
+        // Esconder documento atual carregado do servidor
+        const currentDocDisplay = document.getElementById('currentDocDisplay');
+        if (currentDocDisplay) {
+            currentDocDisplay.style.display = 'none';
+        }
+
+        // Limpar todos os itens de menu
+        const menuContainer = document.getElementById('menuItems');
+        if (menuContainer) {
+            menuContainer.innerHTML = '';
+        }
+
+        // Limpar mensagens de erro
+        Validation.clearErrors();
+
+        Notifications.success('Formulário limpo com sucesso');
     },
 
     /**
@@ -236,14 +331,15 @@ const Editor = {
         const landingJson = JSON.stringify(landing, null, 2);
         const menuJson = JSON.stringify(items, null, 2);
 
-        // Validar
-        const validation = Validation.validateForm(title, subtitle, landingJson, menuJson);
+        // Validar (incluindo conteúdo)
+        const validation = Validation.validateForm(title, subtitle, content, landingJson, menuJson);
 
         return {
             landing: landingJson,
             menu: menuJson,
             valid: validation.valid,
-            errors: validation.errors
+            errors: validation.errors,
+            warnings: validation.warnings
         };
     },
 

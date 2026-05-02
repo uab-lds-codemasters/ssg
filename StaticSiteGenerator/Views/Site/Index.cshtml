@@ -103,15 +103,20 @@
                 </select>
             </div>
             <div class="mb-3">
-                <label for="siteContent" class="form-label">Conteúdo</label>
+                <label for="siteContent" class="form-label">
+                    Conteúdo&nbsp;
+                    <small class="text-muted" id="contentCounter">0 / 50.000 caracteres</small>
+                </label>
                 <textarea id="siteContent" class="form-control" rows="10"
-                          placeholder="Escreve aqui o conteúdo principal da tua página...">@landing.Content</textarea>
+                          placeholder="Escreve aqui o conteúdo principal da tua página..."
+                          maxlength="50000">@landing.Content</textarea>
+                <small class="form-text text-muted">Máximo de 50.000 caracteres. O conteúdo é opcional.</small>
             </div>
             <div class="mb-3">
                 <label for="siteImage" class="form-label">Imagem de Conteúdo</label>
                 @if (!string.IsNullOrWhiteSpace(landing.ImagePath) && landing.ImagePath != "null")
                 {
-                    <div class="mb-2">
+                    <div class="mb-2" id="currentImageDisplay">
                         <img src="@landing.ImagePath" alt="Imagem atual"
                              class="img-thumbnail" style="max-height: 150px;" onerror="this.style.display='none'" />
                         <small class="text-muted d-block mt-1">Imagem atual. Seleciona outra para substituir.</small>
@@ -128,7 +133,7 @@
                 <label for="siteDocument" class="form-label">Documento</label>
                 @if (!string.IsNullOrWhiteSpace(landing.DocumentPath))
                 {
-                    <div class="alert alert-info d-flex align-items-center gap-2 py-2 mb-2">
+                    <div class="alert alert-info d-flex align-items-center gap-2 py-2 mb-2" id="currentDocDisplay">
                         <span>&#128196;</span>
                         <span>Documento atual: <strong>@landing.DocumentName</strong></span>
                         <small class="text-muted ms-1">(seleciona outro para substituir)</small>
@@ -155,7 +160,10 @@
         </div>
     </div>
 
-    <button type="submit" class="btn btn-primary px-4">Gerar</button>
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary px-4">Gerar</button>
+        <button type="button" class="btn btn-outline-secondary px-4" onclick="Editor.limparSelecao()">Limpar seleção</button>
+    </div>
 </form>
 
 <script src="~/js/notifications.js"></script>
