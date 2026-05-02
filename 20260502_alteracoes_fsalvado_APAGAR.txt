@@ -1,0 +1,84 @@
+================================================================================
+ALTERAÇÕES DO BRANCH: melhorias-consolidacao 
+================================================================================
+
+--------------------------------------------------------------------------------
+1. Program.cs 
+--------------------------------------------------------------------------------
+- CORRIGIDO: lógica da condição de ambiente estava invertida.
+    ANTES:  if (!app.Environment.IsDevelopment()) { UseExceptionHandler... }
+    DEPOIS: if (app.Environment.IsDevelopment()) { UseDeveloperExceptionPage() }
+            else { UseExceptionHandler + UseHsts }
+  Em desenvolvimento agora mostra página de erros detalhada;
+  em produção redireciona para página de erro personalizada.
+- Adicionados comentários mais descritivos em cada secção do pipeline HTTP.
+
+
+--------------------------------------------------------------------------------
+2. Controllers/SiteController.cs
+--------------------------------------------------------------------------------
+- Removidas 3 using desnecessários/redundantes:
+    - using System.Collections.Generic;
+    - using System.Data;
+    - using System.IO;
+
+
+--------------------------------------------------------------------------------
+3. Views/Site/Index.cshtml
+--------------------------------------------------------------------------------
+- Campo "Conteúdo":
+    - Adicionado contador de caracteres em tempo real junto ao label
+      ("0 / 50.000 caracteres") com espaço de separação.
+    - Adicionado atributo maxlength="50000" no <textarea>. Antes não tinha qualquer limite
+    - Adicionada mensagem de ajuda: "Máximo de 50.000 caracteres. O conteúdo é opcional."
+- Campo "Imagem": adicionado id="currentImageDisplay" ao <div> para manipulação via JS.
+- Campo "Documento": adicionado id="currentDocDisplay" ao <div> para manipulação via JS.
+- Botões: substituído botão simples "Gerar" por grupo de dois botões:
+    - [Gerar]           → submit, estilo primário
+    - [Limpar seleção]  → button, estilo secundário, chama Editor.limparSelecao()
+
+
+--------------------------------------------------------------------------------
+4. wwwroot/js/editor.js
+--------------------------------------------------------------------------------
+- Adicionada função Editor.limparSelecao() que:
+    - Limpa campos do formulário (título, subtítulo, conteúdo, tema).
+    - Oculta a pré-visualização da imagem atual (currentImageDisplay).
+    - Oculta o bloco do documento atual (currentDocDisplay).
+    - Limpa todos os itens de menu do container (#menuItems).
+    - Invoca Validation.clearErrors() para limpar mensagens de erro.
+    - Mostra notificação de sucesso via Notifications.success().
+- Chamada a Validation.validateForm() atualizada para incluir parâmetro content:
+    ANTES:  Validation.validateForm(title, subtitle, landingJson, menuJson)
+    DEPOIS: Validation.validateForm(title, subtitle, content, landingJson, menuJson)
+
+
+--------------------------------------------------------------------------------
+5. wwwroot/js/validation.js
+--------------------------------------------------------------------------------
+- Adicionada função Validation.validateContent(content):
+    - Conteúdo vazio → válido, mas emite aviso ("Site será gerado sem conteúdo principal").
+    - Conteúdo > 50.000 caracteres → inválido, bloqueia submit.
+    - Caso normal → válido, sem aviso.
+- Validation.validateForm() atualizado:
+    - Novo parâmetro: content.
+    - Valida o conteúdo com validateContent().
+    - Suporte a warnings (avisos não bloqueantes): mostrados como notificações
+      mas não impedem o submit.
+    - Retorno alterado de { valid, errors } para { valid, errors, warnings }.
+
+
+--------------------------------------------------------------------------------
+6. Data/landingPage.json  (dados de exemplo atualizados)
+--------------------------------------------------------------------------------
+- subtitle: "teste"                    →  "Bem vindo"
+- content:  (texto com lixo de teste)  →  "" (vazio)
+
+
+--------------------------------------------------------------------------------
+7. StaticSiteGenerator.csproj
+--------------------------------------------------------------------------------
+- Removida entrada redundante: <Folder Include="Views\" />
+  (a pasta já existe com conteúdo, a entrada era desnecessária).
+
+
