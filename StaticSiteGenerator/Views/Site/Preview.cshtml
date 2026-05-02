@@ -8,8 +8,8 @@
 <html lang=""pt"">
 <head>
   <meta charset=""utf-8"" />
-  <link id=""themeLink"" rel=""stylesheet"" href=""/css/{{THEME}}"" />
-  <style>body {{ margin: 2rem; }} p {{ opacity: 0.6; font-style: italic; }}</style>
+  <link rel=""stylesheet"" href=""/css/{{THEME}}"" />
+  <style>body{{margin:2rem;font-family:'Segoe UI',sans-serif;}} p{{opacity:0.55;font-style:italic;}}</style>
 </head>
 <body>
   <p>Página «{{0}}» — conteúdo a definir ({{1}}).</p>
@@ -21,106 +21,122 @@
 <html lang="pt" data-preview-theme="@Model.LandingPage.Theme">
 <head>
     <meta charset="utf-8" />
-    <title>@Model.LandingPage.Title</title>
+    <title>@Model.LandingPage.Title — Preview</title>
     <link id="themeLink" rel="stylesheet" href="/css/@Model.LandingPage.Theme" />
     <style>
         *, *::before, *::after { box-sizing: border-box; }
 
-        /* Variáveis de cor por tema — aplicadas à shell de pré-visualização */
-
-        /* Default */
+        /* Variáveis de cor por tema */
         :root,
         [data-preview-theme="default.css"] {
-            --sh-body-bg:       #f4f6f9;
-            --sh-header-bg:     #1a3a5c;
-            --sh-header-border: #4a90d9;
-            --sh-header-title:  #ffffff;
-            --sh-header-sub:    #9abcd4;
-            --sh-nav-bg:        #ffffff;
-            --sh-nav-border:    #cdd6e0;
-            --sh-nav-text:      #3a5070;
-            --sh-nav-hover:     #1e56a0;
-            --sh-nav-active:    #1a3a5c;
-            --sh-nav-accent:    #1e56a0;
-            --sh-sub-bg:        #ffffff;
-            --sh-sub-border:    #cdd6e0;
-            --sh-sub-shadow:    rgba(26,58,92,0.12);
-            --sh-sub-text:      #2c3a4a;
-            --sh-sub-hover-bg:  #eef2f7;
-            --sh-sub-hover-txt: #1e56a0;
-            --sh-wrap-bg:       #f4f6f9;
-            --sh-frame-border:  #bdc9d9;
-            --sh-frame-shadow:  rgba(26,58,92,0.08);
-            --sh-footer-bg:     #ffffff;
-            --sh-footer-border: #cdd6e0;
-            --sh-footer-link:   #1e56a0;
-            --sh-footer-hover:  #1a3a5c;
-            --sh-btn-text:      #cddcea;
-            --sh-btn-active-bd: #4a90d9;
+            --sh-body-bg:            #f4f6f9;
+            --sh-header-bg:          #1a3a5c;
+            --sh-header-border:      #4a90d9;
+            --sh-header-title:       #ffffff;
+            --sh-header-sub:         #9abcd4;
+            --sh-nav-bg:             #ffffff;
+            --sh-nav-border:         #cdd6e0;
+            --sh-nav-text:           #3a5070;
+            --sh-nav-hover:          #1e56a0;
+            --sh-nav-active:         #1a3a5c;
+            --sh-nav-accent:         #1e56a0;
+            --sh-sub-bg:             #ffffff;
+            --sh-sub-border:         #cdd6e0;
+            --sh-sub-shadow:         rgba(26,58,92,0.12);
+            --sh-sub-text:           #2c3a4a;
+            --sh-sub-hover-bg:       #eef2f7;
+            --sh-sub-hover-txt:      #1e56a0;
+            --sh-wrap-bg:            #dce4ef;
+            --sh-chrome-bar:         #d4dae4;
+            --sh-chrome-dots-bg:     #c5ccd8;
+            --sh-chrome-addr-bg:     #e8ecf2;
+            --sh-chrome-addr-txt:    #5a6a7a;
+            --sh-frame-border:       #bdc9d9;
+            --sh-frame-shadow:       rgba(26,58,92,0.12);
+            --sh-footer-bg:          #ffffff;
+            --sh-footer-border:      #cdd6e0;
+            --sh-footer-link:        #1e56a0;
+            --sh-footer-hover:       #1a3a5c;
+            --sh-device-bg:          #edf1f7;
+            --sh-device-border:      #cdd6e0;
+            --sh-device-text:        #3a5070;
+            --sh-device-active-bg:   #1a3a5c;
+            --sh-device-active-txt:  #ffffff;
         }
 
-        /* Light */
         [data-preview-theme="light.css"] {
-            --sh-body-bg:       #eef2f7;
-            --sh-header-bg:     #1e4976;
-            --sh-header-border: #2563a8;
-            --sh-header-title:  #f0f6ff;
-            --sh-header-sub:    #8ab4d4;
-            --sh-nav-bg:        #f5f8fc;
-            --sh-nav-border:    #bdc9d9;
-            --sh-nav-text:      #2c3a4a;
-            --sh-nav-hover:     #2563a8;
-            --sh-nav-active:    #1e4976;
-            --sh-nav-accent:    #2563a8;
-            --sh-sub-bg:        #f5f8fc;
-            --sh-sub-border:    #bdc9d9;
-            --sh-sub-shadow:    rgba(30,73,118,0.10);
-            --sh-sub-text:      #2c3a4a;
-            --sh-sub-hover-bg:  #dde8f2;
-            --sh-sub-hover-txt: #1e4976;
-            --sh-wrap-bg:       #eef2f7;
-            --sh-frame-border:  #b0c2d6;
-            --sh-frame-shadow:  rgba(30,73,118,0.07);
-            --sh-footer-bg:     #f5f8fc;
-            --sh-footer-border: #bdc9d9;
-            --sh-footer-link:   #2563a8;
-            --sh-footer-hover:  #1e4976;
-            --sh-btn-text:      #cddcea;
-            --sh-btn-active-bd: #2563a8;
+            --sh-body-bg:            #eef2f7;
+            --sh-header-bg:          #1e4976;
+            --sh-header-border:      #2563a8;
+            --sh-header-title:       #f0f6ff;
+            --sh-header-sub:         #8ab4d4;
+            --sh-nav-bg:             #f5f8fc;
+            --sh-nav-border:         #bdc9d9;
+            --sh-nav-text:           #2c3a4a;
+            --sh-nav-hover:          #2563a8;
+            --sh-nav-active:         #1e4976;
+            --sh-nav-accent:         #2563a8;
+            --sh-sub-bg:             #f5f8fc;
+            --sh-sub-border:         #bdc9d9;
+            --sh-sub-shadow:         rgba(30,73,118,0.10);
+            --sh-sub-text:           #2c3a4a;
+            --sh-sub-hover-bg:       #dde8f2;
+            --sh-sub-hover-txt:      #1e4976;
+            --sh-wrap-bg:            #d5dfe9;
+            --sh-chrome-bar:         #c8d5e5;
+            --sh-chrome-dots-bg:     #b8c8d8;
+            --sh-chrome-addr-bg:     #dce8f2;
+            --sh-chrome-addr-txt:    #4a6080;
+            --sh-frame-border:       #b0c2d6;
+            --sh-frame-shadow:       rgba(30,73,118,0.09);
+            --sh-footer-bg:          #f5f8fc;
+            --sh-footer-border:      #bdc9d9;
+            --sh-footer-link:        #2563a8;
+            --sh-footer-hover:       #1e4976;
+            --sh-device-bg:          #e4ecf4;
+            --sh-device-border:      #bdc9d9;
+            --sh-device-text:        #2c3a4a;
+            --sh-device-active-bg:   #1e4976;
+            --sh-device-active-txt:  #ffffff;
         }
 
-        /* Dark */
         [data-preview-theme="dark.css"] {
-            --sh-body-bg:       #0d1b2a;
-            --sh-header-bg:     #07101a;
-            --sh-header-border: #1e56a0;
-            --sh-header-title:  #d0dff0;
-            --sh-header-sub:    #3d607f;
-            --sh-nav-bg:        #111d2b;
-            --sh-nav-border:    #1e3a55;
-            --sh-nav-text:      #7a96b0;
-            --sh-nav-hover:     #4a90d9;
-            --sh-nav-active:    #cdd8e8;
-            --sh-nav-accent:    #4a90d9;
-            --sh-sub-bg:        #162032;
-            --sh-sub-border:    #1e3a55;
-            --sh-sub-shadow:    rgba(0,0,0,0.35);
-            --sh-sub-text:      #8ab0cc;
-            --sh-sub-hover-bg:  #1e3348;
-            --sh-sub-hover-txt: #74b3f0;
-            --sh-wrap-bg:       #0d1b2a;
-            --sh-frame-border:  #1e3a55;
-            --sh-frame-shadow:  rgba(0,0,0,0.3);
-            --sh-footer-bg:     #111d2b;
-            --sh-footer-border: #1e3a55;
-            --sh-footer-link:   #4a90d9;
-            --sh-footer-hover:  #74b3f0;
-            --sh-btn-text:      #7a9ab8;
-            --sh-btn-active-bd: #4a90d9;
+            --sh-body-bg:            #0d1b2a;
+            --sh-header-bg:          #07101a;
+            --sh-header-border:      #1e56a0;
+            --sh-header-title:       #d0dff0;
+            --sh-header-sub:         #3d607f;
+            --sh-nav-bg:             #111d2b;
+            --sh-nav-border:         #1e3a55;
+            --sh-nav-text:           #7a96b0;
+            --sh-nav-hover:          #4a90d9;
+            --sh-nav-active:         #cdd8e8;
+            --sh-nav-accent:         #4a90d9;
+            --sh-sub-bg:             #162032;
+            --sh-sub-border:         #1e3a55;
+            --sh-sub-shadow:         rgba(0,0,0,0.35);
+            --sh-sub-text:           #8ab0cc;
+            --sh-sub-hover-bg:       #1e3348;
+            --sh-sub-hover-txt:      #74b3f0;
+            --sh-wrap-bg:            #060e18;
+            --sh-chrome-bar:         #0a1520;
+            --sh-chrome-dots-bg:     #111d2b;
+            --sh-chrome-addr-bg:     #0d1b2a;
+            --sh-chrome-addr-txt:    #4a6a85;
+            --sh-frame-border:       #1e3a55;
+            --sh-frame-shadow:       rgba(0,0,0,0.4);
+            --sh-footer-bg:          #111d2b;
+            --sh-footer-border:      #1e3a55;
+            --sh-footer-link:        #4a90d9;
+            --sh-footer-hover:       #74b3f0;
+            --sh-device-bg:          #0d1b2a;
+            --sh-device-border:      #1e3a55;
+            --sh-device-text:        #7a96b0;
+            --sh-device-active-bg:   #1e3a55;
+            --sh-device-active-txt:  #cdd8e8;
         }
 
-        /* Estilos da shell */
-
+        /* Layout */
         body {
             display: flex;
             flex-direction: column;
@@ -129,80 +145,79 @@
             font-family: 'Segoe UI', Arial, sans-serif;
             background: var(--sh-body-bg);
             color: var(--sh-nav-text);
-            transition: background 0.25s, color 0.25s;
+            transition: background 0.3s, color 0.3s;
         }
 
         /* Cabeçalho */
         .site-header {
-            padding: 1.2rem 2.5rem 1rem;
+            padding: 0.9rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 1rem;
+            gap: 1.5rem;
             background: var(--sh-header-bg);
             border-bottom: 3px solid var(--sh-header-border);
-            transition: background 0.25s, border-color 0.25s;
+            transition: background 0.3s, border-color 0.3s;
         }
-
         .site-header-text h1 {
-            margin: 0 0 0.15rem;
-            font-size: 1.35rem;
+            margin: 0 0 0.1rem;
+            font-size: 1.15rem;
             font-weight: 700;
             color: var(--sh-header-title);
             letter-spacing: -0.01em;
         }
-        .site-header-text p {
-            margin: 0;
-            font-size: 0.85rem;
-            color: var(--sh-header-sub);
-        }
+        .site-header-text p { margin: 0; font-size: 0.78rem; color: var(--sh-header-sub); }
 
-        /* Botões de tema */
-        .theme-switcher {
+        /* Galeria de temas */
+        .theme-gallery {
             display: flex;
-            gap: 0.4rem;
             align-items: center;
+            gap: 0.5rem;
             flex-shrink: 0;
         }
-
-        .theme-switcher span {
-            font-size: 0.72rem;
+        .theme-label {
+            font-size: 0.65rem;
             color: var(--sh-header-sub);
-            margin-right: 0.3rem;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.07em;
+            margin-right: 0.15rem;
         }
-
-        .theme-btn {
+        .theme-card {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 0.35rem;
-            padding: 0.28rem 0.65rem;
-            border-radius: 20px;
+            gap: 0.28rem;
+            padding: 0.3rem 0.45rem 0.32rem;
+            border-radius: 8px;
             border: 2px solid transparent;
             cursor: pointer;
-            font-size: 0.75rem;
-            font-weight: 500;
-            transition: border-color 0.2s, background 0.2s;
-            background: rgba(255,255,255,0.08);
-            color: var(--sh-btn-text);
+            background: rgba(255,255,255,0.07);
+            color: rgba(255,255,255,0.7);
+            font-size: 0;
+            transition: border-color 0.2s, background 0.2s, transform 0.15s;
         }
-
-        .theme-btn:hover { background: rgba(255,255,255,0.16); }
-
-        .theme-btn.active {
-            border-color: var(--sh-btn-active-bd);
-            background: rgba(74,144,217,0.18);
-            color: var(--sh-header-title);
+        .theme-card:hover { background: rgba(255,255,255,0.15); transform: translateY(-1px); }
+        .theme-card.active { border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.15); }
+        .theme-card span { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.02em; }
+        .theme-swatch {
+            width: 44px;
+            height: 26px;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.2);
+            display: flex;
+            flex-direction: column;
         }
-
-        .theme-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            border: 1px solid rgba(255,255,255,0.25);
-            flex-shrink: 0;
+        .swatch-head { height: 8px; }
+        .swatch-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 2px;
+            padding: 0 4px;
         }
+        .swatch-line { height: 2px; border-radius: 1px; }
 
         /* Navegação */
         nav {
@@ -211,37 +226,25 @@
             border-bottom: 2px solid var(--sh-nav-border);
             display: flex;
             flex-wrap: wrap;
-            gap: 0;
-            transition: background 0.25s, border-color 0.25s;
+            transition: background 0.3s, border-color 0.3s;
         }
-
         nav a {
-            padding: 0.65rem 1rem;
+            padding: 0.58rem 1rem;
             text-decoration: none;
             cursor: pointer;
-            font-size: 0.88rem;
+            font-size: 0.85rem;
             font-weight: 500;
             color: var(--sh-nav-text);
             border-bottom: 3px solid transparent;
-            transition: color 0.15s, border-color 0.15s;
             display: inline-block;
+            transition: color 0.15s, border-color 0.15s;
         }
-
-        nav a:hover { color: var(--sh-nav-hover); border-bottom-color: var(--sh-nav-accent); }
+        nav a:hover  { color: var(--sh-nav-hover); border-bottom-color: var(--sh-nav-accent); }
         nav a.active { color: var(--sh-nav-active); border-bottom-color: var(--sh-nav-accent); font-weight: 700; }
 
-        /* Submenu dropdown */
-        .nav-item {
-            position: relative;
-            display: inline-block;
-        }
-
-        .nav-item > a::after {
-            content: ' ▾';
-            font-size: 0.72em;
-            opacity: 0.55;
-        }
-
+        /* Submenu */
+        .nav-item { position: relative; display: inline-block; }
+        .nav-item > a::after { content: ' ▾'; font-size: 0.72em; opacity: 0.5; }
         .submenu {
             display: none;
             position: absolute;
@@ -251,58 +254,117 @@
             background: var(--sh-sub-bg);
             border: 1px solid var(--sh-sub-border);
             border-radius: 6px;
-            box-shadow: 0 4px 12px var(--sh-sub-shadow);
+            box-shadow: 0 4px 14px var(--sh-sub-shadow);
             overflow: hidden;
             z-index: 100;
-            transition: background 0.25s;
         }
+        .nav-item:hover .submenu, .nav-item:focus-within .submenu { display: block; }
+        .submenu a { display: block; padding: 0.48rem 1rem; border-bottom: none; color: var(--sh-sub-text); font-size: 0.84rem; }
+        .submenu a:hover { background: var(--sh-sub-hover-bg); color: var(--sh-sub-hover-txt); }
 
-        .nav-item:hover .submenu,
-        .nav-item:focus-within .submenu { display: block; }
-
-        .submenu a {
-            display: block;
-            padding: 0.5rem 1.1rem;
-            border-radius: 0;
-            border-bottom: none;
-            color: var(--sh-sub-text);
-            font-size: 0.85rem;
+        /* Barra de dispositivos */
+        .device-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.45rem 2rem;
+            background: var(--sh-device-bg);
+            border-bottom: 1px solid var(--sh-device-border);
+            transition: background 0.3s;
         }
-
-        .submenu a:hover {
-            background: var(--sh-sub-hover-bg);
-            color: var(--sh-sub-hover-txt);
+        .device-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.07em; opacity: 0.6; margin-right: 0.3rem; }
+        .device-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.22rem 0.65rem;
+            border-radius: 5px;
+            border: 1px solid var(--sh-device-border);
+            background: transparent;
+            color: var(--sh-device-text);
+            font-size: 0.73rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s, border-color 0.15s;
         }
+        .device-btn:hover { background: rgba(128,128,128,0.1); }
+        .device-btn.active { background: var(--sh-device-active-bg); color: var(--sh-device-active-txt); border-color: transparent; }
+        .device-dim { font-size: 0.62rem; opacity: 0.55; }
 
         /* Área da frame */
         .content-frame-wrapper {
             flex: 1;
-            padding: 1.5rem 2.5rem;
+            padding: 1.5rem 2rem;
             background: var(--sh-wrap-bg);
-            transition: background 0.25s;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            transition: background 0.3s;
         }
+        .browser-chrome-outer {
+            width: 100%;
+            transition: max-width 0.35s cubic-bezier(0.4,0,0.2,1);
+        }
+
+        /* Chrome do browser */
+        .browser-chrome {
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--sh-frame-border);
+            box-shadow: 0 6px 28px var(--sh-frame-shadow), 0 1px 3px var(--sh-frame-shadow);
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .chrome-bar {
+            background: var(--sh-chrome-bar);
+            padding: 0.42rem 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            border-bottom: 1px solid var(--sh-frame-border);
+        }
+        .chrome-dots { display: flex; gap: 0.32rem; flex-shrink: 0; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; }
+        .dot-red    { background: #ff5f57; }
+        .dot-yellow { background: #febc2e; }
+        .dot-green  { background: #28c840; }
+        .chrome-addr {
+            flex: 1;
+            background: var(--sh-chrome-addr-bg);
+            border-radius: 20px;
+            padding: 0.2rem 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-size: 0.7rem;
+            color: var(--sh-chrome-addr-txt);
+            border: 1px solid var(--sh-frame-border);
+            min-width: 0;
+            transition: background 0.3s;
+        }
+        .addr-lock { opacity: 0.6; font-size: 0.65rem; }
+        .addr-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .chrome-body { background: #fff; }
 
         #contentFrame {
             width: 100%;
-            height: 430px;
-            border: 1px solid var(--sh-frame-border);
-            border-radius: 6px;
-            background: white;
-            box-shadow: 0 2px 8px var(--sh-frame-shadow);
-            transition: border-color 0.25s, box-shadow 0.25s;
+            height: 460px;
+            border: none;
+            display: block;
+            opacity: 1;
+            transition: opacity 0.18s ease;
         }
+        #contentFrame.fading { opacity: 0; }
 
         /* Rodapé */
         .site-footer {
-            padding: 0.75rem 2.5rem;
+            padding: 0.65rem 2rem;
             background: var(--sh-footer-bg);
             border-top: 1px solid var(--sh-footer-border);
-            font-size: 0.82rem;
+            font-size: 0.8rem;
             display: flex;
             justify-content: flex-end;
-            transition: background 0.25s, border-color 0.25s;
+            transition: background 0.3s, border-color 0.3s;
         }
-
         .site-footer a {
             text-decoration: none;
             color: var(--sh-footer-link);
@@ -314,30 +376,83 @@
 </head>
 <body>
 
+    <!-- Cabeçalho com galeria de temas -->
     <div class="site-header">
         <div class="site-header-text">
             <h1>@Model.LandingPage.Title</h1>
             <p>@Model.LandingPage.Subtitle</p>
         </div>
 
-        <div class="theme-switcher">
-            <span>Tema:</span>
-            <button class="theme-btn" data-theme="default.css" onclick="setTheme(this)">
-                <span class="theme-dot" style="background:#ffffff;"></span> Default
+        <div class="theme-gallery">
+            <span class="theme-label">Tema</span>
+
+            <button class="theme-card" data-theme="default.css" onclick="setTheme(this)" title="Default — branco/azul naval">
+                <div class="theme-swatch">
+                    <div class="swatch-head" style="background:#1a3a5c;"></div>
+                    <div class="swatch-body" style="background:#ffffff;">
+                        <div class="swatch-line" style="background:#cdd6e0; width:80%;"></div>
+                        <div class="swatch-line" style="background:#cdd6e0; width:55%;"></div>
+                    </div>
+                </div>
+                <span>Default</span>
             </button>
-            <button class="theme-btn" data-theme="light.css" onclick="setTheme(this)">
-                <span class="theme-dot" style="background:#eef2f7;"></span> Light
+
+            <button class="theme-card" data-theme="light.css" onclick="setTheme(this)" title="Light — cinzento ardósia">
+                <div class="theme-swatch">
+                    <div class="swatch-head" style="background:#1e4976;"></div>
+                    <div class="swatch-body" style="background:#eef2f7;">
+                        <div class="swatch-line" style="background:#bdc9d9; width:80%;"></div>
+                        <div class="swatch-line" style="background:#bdc9d9; width:55%;"></div>
+                    </div>
+                </div>
+                <span>Light</span>
             </button>
-            <button class="theme-btn" data-theme="dark.css" onclick="setTheme(this)">
-                <span class="theme-dot" style="background:#0d1b2a;"></span> Dark
+
+            <button class="theme-card" data-theme="dark.css" onclick="setTheme(this)" title="Dark — azul naval profundo">
+                <div class="theme-swatch">
+                    <div class="swatch-head" style="background:#07101a;"></div>
+                    <div class="swatch-body" style="background:#0d1b2a;">
+                        <div class="swatch-line" style="background:#1e3a55; width:80%;"></div>
+                        <div class="swatch-line" style="background:#1e3a55; width:55%;"></div>
+                    </div>
+                </div>
+                <span>Dark</span>
             </button>
         </div>
     </div>
 
+    <!-- Navegação -->
     <nav id="siteNav"></nav>
 
+    <!-- Switcher de dispositivos -->
+    <div class="device-toolbar">
+        <span class="device-label">Dispositivo</span>
+        <button class="device-btn active" data-max="100%" onclick="setDevice(this)">🖥 Desktop</button>
+        <button class="device-btn" data-max="1024px" onclick="setDevice(this)">💻 Laptop <span class="device-dim">1024px</span></button>
+        <button class="device-btn" data-max="768px"  onclick="setDevice(this)">📱 Tablet <span class="device-dim">768px</span></button>
+        <button class="device-btn" data-max="375px"  onclick="setDevice(this)">📱 Mobile <span class="device-dim">375px</span></button>
+    </div>
+
+    <!-- Frame com moldura de browser -->
     <div class="content-frame-wrapper">
-        <iframe id="contentFrame" title="Conteúdo da página"></iframe>
+        <div class="browser-chrome-outer" id="browserOuter">
+            <div class="browser-chrome">
+                <div class="chrome-bar">
+                    <div class="chrome-dots">
+                        <span class="dot dot-red"></span>
+                        <span class="dot dot-yellow"></span>
+                        <span class="dot dot-green"></span>
+                    </div>
+                    <div class="chrome-addr">
+                        <span class="addr-lock">🔒</span>
+                        <span class="addr-text" id="addrText">localhost</span>
+                    </div>
+                </div>
+                <div class="chrome-body">
+                    <iframe id="contentFrame" title="Conteúdo da página"></iframe>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="site-footer">
@@ -352,43 +467,40 @@
 
         let currentTheme = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.LandingPage.Theme));
 
-        // Aplica o tema à shell inteira (atributo no <html>) e recarrega a frame
+        // Muda largura do dispositivo
+        function setDevice(btn) {
+            document.querySelectorAll('.device-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('browserOuter').style.maxWidth = btn.getAttribute('data-max');
+        }
+
+        // Aplica tema à shell e recarrega frame
         function setTheme(btn) {
             currentTheme = btn.getAttribute('data-theme');
-
-            // Muda a CSS global da shell
             document.documentElement.setAttribute('data-preview-theme', currentTheme);
-            document.getElementById('themeLink').href = `/css/${currentTheme}`;
-
-            // Marca botão activo
-            document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('themeLink').href = '/css/' + currentTheme;
+            document.querySelectorAll('.theme-card').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-
-            // Recarrega a página activa na frame com o novo tema
             const active = document.querySelector('#siteNav a.active');
             if (active) loadPage(active);
         }
 
-        // Constrói o nav com suporte a submenus (children)
+        // Constrói o nav com suporte a submenus
         function buildNav() {
             const nav = document.getElementById('siteNav');
             nav.innerHTML = '';
-
             menuData.forEach(item => {
                 if (item.children && item.children.length > 0) {
                     const wrapper = document.createElement('div');
                     wrapper.className = 'nav-item';
                     wrapper.setAttribute('tabindex', '0');
-
                     const parent = document.createElement('a');
                     parent.href = '#';
                     parent.textContent = item.title;
                     parent.onclick = e => e.preventDefault();
                     wrapper.appendChild(parent);
-
                     const submenu = document.createElement('div');
                     submenu.className = 'submenu';
-
                     item.children.forEach(child => {
                         const link = document.createElement('a');
                         link.href = '#';
@@ -398,7 +510,6 @@
                         link.onclick = e => { e.preventDefault(); loadPage(link); };
                         submenu.appendChild(link);
                     });
-
                     wrapper.appendChild(submenu);
                     nav.appendChild(wrapper);
                 } else {
@@ -415,12 +526,11 @@
 
         function buildHomeDoc(theme) {
             const ts = Date.now();
-            return `<!DOCTYPE html><html lang="pt"><head><meta charset="utf-8"/>`
-                 + `<title>${siteTitle}</title>`
-                 + `<link rel="stylesheet" href="/css/${theme}?v=${ts}"/>`
-                 + `<style>body{margin:2rem}</style></head><body>`
-                 + `<h1>${siteTitle}</h1><p>${siteSubtitle}</p>`
-                 + `</body></html>`;
+            return '<!DOCTYPE html><html lang="pt"><head><meta charset="utf-8"/>'
+                 + '<link rel="stylesheet" href="/css/' + theme + '?v=' + ts + '"/>'
+                 + '<style>body{margin:2rem}</style></head><body>'
+                 + '<h1>' + siteTitle + '</h1><p>' + siteSubtitle + '</p>'
+                 + '</body></html>';
         }
 
         function buildPlaceholder(theme, title, link) {
@@ -435,31 +545,36 @@
             const href  = link.getAttribute('data-href');
             const title = link.getAttribute('data-title');
             const frame = document.getElementById('contentFrame');
+            const addr  = document.getElementById('addrText');
 
-            if (href === '/') {
-                frame.removeAttribute('src');
-                frame.srcdoc = buildHomeDoc(currentTheme);
-            } else if (href.startsWith('http://') || href.startsWith('https://')) {
-                window.open(href, '_blank');
-                frame.removeAttribute('src');
-                frame.srcdoc = buildPlaceholder(currentTheme, title, '&#8599; aberto em nova aba');
-            } else {
-                frame.removeAttribute('src');
-                frame.srcdoc = buildPlaceholder(currentTheme, title, href);
-            }
+            frame.classList.add('fading');
+            setTimeout(() => {
+                if (href === '/') {
+                    frame.removeAttribute('src');
+                    frame.srcdoc = buildHomeDoc(currentTheme);
+                    if (addr) addr.textContent = siteTitle;
+                } else if (href.startsWith('http://') || href.startsWith('https://')) {
+                    window.open(href, '_blank');
+                    frame.removeAttribute('src');
+                    frame.srcdoc = buildPlaceholder(currentTheme, title, '&#8599; aberto em nova aba');
+                    if (addr) addr.textContent = href;
+                } else {
+                    frame.removeAttribute('src');
+                    frame.srcdoc = buildPlaceholder(currentTheme, title, href);
+                    if (addr) addr.textContent = href;
+                }
+                frame.classList.remove('fading');
+            }, 180);
 
             document.querySelectorAll('#siteNav a').forEach(a => a.classList.remove('active'));
             link.classList.add('active');
         }
 
-        // Marca o botão de tema inicial como activo
-        const initialBtn = document.querySelector(`.theme-btn[data-theme="${currentTheme}"]`);
+        // Inicialização
+        const initialBtn = document.querySelector('.theme-card[data-theme="' + currentTheme + '"]');
         if (initialBtn) initialBtn.classList.add('active');
-
-        // Constrói o nav e abre "Início" automaticamente
         buildNav();
-        const inicio = document.querySelector('#siteNav a[data-href="/"]')
-                    || document.querySelector('#siteNav a');
+        const inicio = document.querySelector('#siteNav a[data-href="/"]') || document.querySelector('#siteNav a');
         if (inicio) loadPage(inicio);
     </script>
 

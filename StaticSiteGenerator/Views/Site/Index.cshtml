@@ -4,6 +4,24 @@
     ViewData["Title"] = "Editor JSON";
 }
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css" />
+<style>
+    .CodeMirror {
+        border: 1px solid #dee2e6;
+        border-radius: 0.375rem;
+        font-size: 0.84rem;
+        font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+    }
+    .cm-wrap-invalid .CodeMirror { border-color: #dc3545; }
+    .cm-wrap-valid   .CodeMirror { border-color: #198754; }
+    .cm-feedback { font-size: 0.8rem; color: #dc3545; margin-top: 0.25rem; min-height: 1.2em; }
+
+    /* Editor visual de menu */
+    .menu-item-row { display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.3rem; }
+    .menu-children { margin-left: 2rem; padding-left: 0.6rem; border-left: 2px solid #dee2e6; margin-bottom: 0.3rem; }
+    .btn-move { width: 22px; height: 22px; padding: 0; font-size: 0.62rem; line-height: 1; }
+</style>
+
 @if (TempData["Sucesso"] != null)
 {
     <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -26,6 +44,32 @@
 </div>
 
 <form action="/Site/Preview" method="post" target="_blank" id="editorForm">
+
+    @* Campos rápidos — título, subtítulo e tema *@
+    <div class="card shadow-sm mb-4">
+        <div class="card-header fw-semibold">Campos rápidos</div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-5">
+                    <label for="qTitle" class="form-label form-label-sm fw-semibold mb-1">Título</label>
+                    <input type="text" id="qTitle" class="form-control form-control-sm" placeholder="Título da página" />
+                </div>
+                <div class="col-md-5">
+                    <label for="qSubtitle" class="form-label form-label-sm fw-semibold mb-1">Subtítulo</label>
+                    <input type="text" id="qSubtitle" class="form-control form-control-sm" placeholder="Subtítulo / descrição" />
+                </div>
+                <div class="col-md-2">
+                    <label for="themeSelect" class="form-label form-label-sm fw-semibold mb-1">Tema</label>
+                    <select id="themeSelect" class="form-select form-select-sm">
+                        <option value="default.css">Default</option>
+                        <option value="light.css">Light</option>
+                        <option value="dark.css">Dark</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row g-4">
 
         @* Landing Page JSON *@
@@ -33,27 +77,19 @@
             <div class="card shadow-sm h-100">
                 <div class="card-header d-flex justify-content-between align-items-center fw-semibold">
                     <span>Landing Page JSON</span>
-                    <label class="btn btn-outline-secondary btn-sm mb-0">
-                        &#8679; Carregar JSON
-                        <input type="file" id="uploadLanding" accept=".json,application/json" class="d-none" />
-                    </label>
-                </div>
-                <div class="card-body d-flex flex-column gap-3">
-                    <textarea id="landingJson"
-                              name="landingJson"
-                              class="form-control editor-textarea"
-                              rows="13"
-                              spellcheck="false">@Model.LandingJson</textarea>
-
-                    <div>
-                        <label for="themeSelect" class="form-label fw-semibold mb-1">Tema visual</label>
-                        <select id="themeSelect" class="form-select">
-                            <option value="default.css">Default (fundo branco)</option>
-                            <option value="light.css">Light (cinzento claro)</option>
-                            <option value="dark.css">Dark (fundo escuro)</option>
-                        </select>
-                        <div class="form-text">Altera automaticamente o campo "theme" no JSON acima.</div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="formatJson('landing')">{ } Formatar</button>
+                        <label class="btn btn-outline-secondary btn-sm mb-0">
+                            &#8679; Carregar JSON
+                            <input type="file" id="uploadLanding" accept=".json,application/json" class="d-none" />
+                        </label>
                     </div>
+                </div>
+                <div class="card-body d-flex flex-column gap-2">
+                    <div id="landingEditorWrap">
+                        <textarea id="landingJson" name="landingJson" spellcheck="false">@Model.LandingJson</textarea>
+                    </div>
+                    <div id="landingFeedback" class="cm-feedback"></div>
                 </div>
             </div>
         </div>
@@ -61,19 +97,32 @@
         @* Menu JSON *@
         <div class="col-lg-5">
             <div class="card shadow-sm h-100">
-                <div class="card-header d-flex justify-content-between align-items-center fw-semibold">
-                    <span>Menu JSON</span>
-                    <label class="btn btn-outline-secondary btn-sm mb-0">
-                        &#8679; Carregar JSON
-                        <input type="file" id="uploadMenu" accept=".json,application/json" class="d-none" />
-                    </label>
+                <div class="card-header fw-semibold">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex gap-1">
+                            <button type="button" id="tabVisual" class="btn btn-secondary btn-sm"         onclick="switchMenuTab('visual')">Visual</button>
+                            <button type="button" id="tabJson"   class="btn btn-outline-secondary btn-sm" onclick="switchMenuTab('json')">JSON</button>
+                        </div>
+                        <div class="d-flex gap-2 align-items-center">
+                            <button type="button" id="btnFormatMenu" class="btn btn-outline-secondary btn-sm d-none" onclick="formatJson('menu')">{ } Formatar</button>
+                            <label class="btn btn-outline-secondary btn-sm mb-0">
+                                &#8679; Carregar JSON
+                                <input type="file" id="uploadMenu" accept=".json,application/json" class="d-none" />
+                            </label>
+                        </div>
+                    </div>
                 </div>
                 <div class="card-body">
-                    <textarea id="menuJson"
-                              name="menuJson"
-                              class="form-control editor-textarea"
-                              rows="16"
-                              spellcheck="false">@Model.MenuJson</textarea>
+                    <div id="menuVisualPane">
+                        <div id="menuVisualEditor" class="mb-2"></div>
+                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="addMenuItem(-1)">+ Adicionar item</button>
+                    </div>
+                    <div id="menuJsonPane" style="display:none">
+                        <div id="menuEditorWrap">
+                            <textarea id="menuJson" name="menuJson" spellcheck="false">@Model.MenuJson</textarea>
+                        </div>
+                        <div id="menuFeedback" class="cm-feedback"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -113,71 +162,145 @@
     </div>
 </form>
 
+@* Container de toasts *@
+<div class="toast-container position-fixed bottom-0 end-0 p-3" id="toastContainer" style="z-index:1100"></div>
+
 @section Scripts {
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
 <script>
-    const themeSelect    = document.getElementById('themeSelect');
-    const landingTextarea = document.getElementById('landingJson');
-    const menuTextarea   = document.getElementById('menuJson');
-    const validationMsg  = document.getElementById('validationMsg');
 
-    // Validação visual das textareas
-    function markField(textarea, valid, msg) {
-        textarea.classList.toggle('is-invalid', !valid);
-        textarea.classList.toggle('is-valid',   valid);
+    // Inicialização dos editores CodeMirror
+    const cmOpts = {
+        mode: { name: 'javascript', json: true },
+        lineNumbers: true,
+        tabSize: 2,
+        indentWithTabs: false,
+        lineWrapping: false
+    };
 
-        // Feedback abaixo do campo
-        let fb = textarea.nextElementSibling;
-        if (!fb || !fb.classList.contains('invalid-feedback')) {
-            fb = document.createElement('div');
-            fb.className = 'invalid-feedback';
-            textarea.parentNode.insertBefore(fb, textarea.nextSibling);
-        }
+    const cmLanding = CodeMirror.fromTextArea(document.getElementById('landingJson'), cmOpts);
+    const cmMenu    = CodeMirror.fromTextArea(document.getElementById('menuJson'),    cmOpts);
+
+    cmLanding.setSize(null, 310);
+    cmMenu.setSize(null, 360);
+
+    // Toasts — notificações não intrusivas
+    function showToast(msg, tipo) {
+        const id  = 'toast-' + Date.now();
+        const cor = tipo === 'sucesso' ? 'bg-success text-white'
+                  : tipo === 'erro'    ? 'bg-danger text-white'
+                  :                      'bg-secondary text-white';
+        document.getElementById('toastContainer').insertAdjacentHTML('beforeend', `
+            <div id="${id}" class="toast align-items-center border-0 ${cor}" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body">${msg}</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            </div>`);
+        const el = document.getElementById(id);
+        new bootstrap.Toast(el, { delay: 3500 }).show();
+        el.addEventListener('hidden.bs.toast', () => el.remove());
+    }
+
+    // Marcação visual dos editores
+    const landingWrap   = document.getElementById('landingEditorWrap');
+    const landingFb     = document.getElementById('landingFeedback');
+    const menuWrap      = document.getElementById('menuEditorWrap');
+    const menuFb        = document.getElementById('menuFeedback');
+    const validationMsg = document.getElementById('validationMsg');
+    const themeSelect   = document.getElementById('themeSelect');
+
+    function markEditor(wrap, fb, valid, msg) {
+        wrap.classList.toggle('cm-wrap-invalid', !valid);
+        wrap.classList.toggle('cm-wrap-valid',    valid);
         fb.textContent = valid ? '' : msg;
     }
 
-    function clearMark(textarea) {
-        textarea.classList.remove('is-invalid', 'is-valid');
-        const fb = textarea.nextElementSibling;
-        if (fb && fb.classList.contains('invalid-feedback')) fb.textContent = '';
+    function clearMark(wrap, fb) {
+        wrap.classList.remove('cm-wrap-invalid', 'cm-wrap-valid');
+        fb.textContent = '';
     }
 
+    // Validação dos editores
     function validateLandingJson() {
-        const raw = landingTextarea.value.trim();
-        if (!raw) { clearMark(landingTextarea); return null; }
+        const raw = cmLanding.getValue().trim();
+        if (!raw) { clearMark(landingWrap, landingFb); return null; }
         try {
             const data = JSON.parse(raw);
             if (typeof data !== 'object' || Array.isArray(data))
                 throw new Error('Deve ser um objecto JSON { ... }');
             if (!data.title || !data.title.trim())
                 throw new Error('Campo "title" em falta ou vazio');
-            markField(landingTextarea, true, '');
+            markEditor(landingWrap, landingFb, true, '');
             return data;
         } catch (e) {
-            markField(landingTextarea, false, 'Landing Page JSON inválido: ' + e.message);
+            markEditor(landingWrap, landingFb, false, 'Landing Page JSON inválido: ' + e.message);
             return null;
         }
     }
 
     function validateMenuJson() {
-        const raw = menuTextarea.value.trim();
-        if (!raw) { clearMark(menuTextarea); return null; }
+        const raw = cmMenu.getValue().trim();
+        if (!raw) { clearMark(menuWrap, menuFb); return null; }
         try {
             const data = JSON.parse(raw);
             if (!Array.isArray(data))
                 throw new Error('Deve ser um array JSON [ ... ]');
-            markField(menuTextarea, true, '');
+            markEditor(menuWrap, menuFb, true, '');
             return data;
         } catch (e) {
-            markField(menuTextarea, false, 'Menu JSON inválido: ' + e.message);
+            markEditor(menuWrap, menuFb, false, 'Menu JSON inválido: ' + e.message);
             return null;
         }
     }
 
-    // Valida em tempo real enquanto o utilizador escreve
-    landingTextarea.addEventListener('input', () => { validateLandingJson(); syncThemeFromJson(); });
-    menuTextarea.addEventListener('input', validateMenuJson);
+    // Campos rápidos — sincronização bidirecional com o Landing JSON
+    const qTitle    = document.getElementById('qTitle');
+    const qSubtitle = document.getElementById('qSubtitle');
 
-    // Validação antes de submeter o formulário
+    function syncQuickFromJson() {
+        try {
+            const data = JSON.parse(cmLanding.getValue());
+            const t = data.title    || '';
+            const s = data.subtitle || '';
+            // Só atualiza se o campo não estiver em foco, para não resetar o cursor
+            if (document.activeElement !== qTitle    && qTitle.value    !== t) qTitle.value    = t;
+            if (document.activeElement !== qSubtitle && qSubtitle.value !== s) qSubtitle.value = s;
+            if (data.theme && themeSelect.querySelector(`option[value="${data.theme}"]`))
+                if (themeSelect.value !== data.theme) themeSelect.value = data.theme;
+        } catch (e) {}
+    }
+
+    function patchLandingField(campo, valor) {
+        try {
+            const data = JSON.parse(cmLanding.getValue());
+            if (data[campo] === valor) return;
+            data[campo] = valor;
+            cmLanding.setValue(JSON.stringify(data, null, 2));
+        } catch (e) {}
+    }
+
+    qTitle.addEventListener('input',    () => patchLandingField('title',    qTitle.value));
+    qSubtitle.addEventListener('input', () => patchLandingField('subtitle', qSubtitle.value));
+    themeSelect.addEventListener('change', () => patchLandingField('theme', themeSelect.value));
+
+    // Eventos dos editores em tempo real
+    cmLanding.on('change', () => { validateLandingJson(); syncQuickFromJson(); });
+    cmMenu.on('change',    () => { validateMenuJson(); });
+
+    // Formatar JSON
+    function formatJson(qual) {
+        const cm = qual === 'landing' ? cmLanding : cmMenu;
+        try {
+            cm.setValue(JSON.stringify(JSON.parse(cm.getValue()), null, 2));
+            showToast('JSON formatado com sucesso.', 'sucesso');
+        } catch (e) {
+            showToast('Não foi possível formatar: JSON inválido.', 'erro');
+        }
+    }
+
+    // Validação no submit
     document.getElementById('editorForm').addEventListener('submit', function (e) {
         const landing = validateLandingJson();
         const menu    = validateMenuJson();
@@ -196,26 +319,159 @@
         }
     });
 
-    // Seletor de tema — sincroniza com o campo "theme" no JSON
-    function syncThemeFromJson() {
+    // Editor visual de menu
+    let menuState = [];
+
+    function syncMenuFromJson() {
         try {
-            const data = JSON.parse(landingTextarea.value);
-            if (data.theme && themeSelect.querySelector(`option[value="${data.theme}"]`)) {
-                themeSelect.value = data.theme;
+            const data = JSON.parse(cmMenu.getValue());
+            if (Array.isArray(data)) {
+                menuState = JSON.parse(JSON.stringify(data));
+                renderMenuEditor();
             }
         } catch (e) {}
     }
 
-    function syncThemeToJson() {
-        try {
-            const data = JSON.parse(landingTextarea.value);
-            data.theme = themeSelect.value;
-            landingTextarea.value = JSON.stringify(data, null, 2);
-        } catch (e) {}
+    function updateMenuJSON() {
+        cmMenu.setValue(JSON.stringify(menuState, null, 2));
     }
 
-    syncThemeFromJson();
-    themeSelect.addEventListener('change', syncThemeToJson);
+    function renderMenuEditor() {
+        const container = document.getElementById('menuVisualEditor');
+        container.innerHTML = '';
+        menuState.forEach((item, i) => container.appendChild(buildItemRow(item, i, -1)));
+    }
+
+    function buildItemRow(item, idx, parentIdx) {
+        const isRoot      = parentIdx === -1;
+        const hasChildren = isRoot && Array.isArray(item.children) && item.children.length > 0;
+        const wrapper     = document.createElement('div');
+
+        const row = document.createElement('div');
+        row.className = 'menu-item-row';
+
+        // Botões de reordenação
+        const btnUp   = makeBtn('▲', 'btn-outline-secondary btn-move', () => moveItem(idx, -1, parentIdx));
+        const btnDown = makeBtn('▼', 'btn-outline-secondary btn-move', () => moveItem(idx,  1, parentIdx));
+
+        // Input de título
+        const inpTitle = document.createElement('input');
+        inpTitle.type        = 'text';
+        inpTitle.className   = 'form-control form-control-sm flex-grow-1';
+        inpTitle.placeholder = 'Título';
+        inpTitle.value       = item.title || '';
+        inpTitle.oninput     = () => { getRef(idx, parentIdx).title = inpTitle.value; updateMenuJSON(); };
+
+        // Input de link (desativado quando tem filhos)
+        const inpLink = document.createElement('input');
+        inpLink.type        = 'text';
+        inpLink.className   = 'form-control form-control-sm flex-grow-1';
+        inpLink.placeholder = hasChildren ? 'tem submenus' : 'link';
+        inpLink.value       = item.link || '';
+        inpLink.disabled    = hasChildren;
+        inpLink.oninput     = () => { getRef(idx, parentIdx).link = inpLink.value; updateMenuJSON(); };
+
+        row.append(btnUp, btnDown, inpTitle, inpLink);
+
+        // Botão adicionar subitem (só em itens raiz)
+        if (isRoot) {
+            const btnChild = makeBtn('⊕', 'btn-outline-secondary btn-sm', () => addMenuItem(idx));
+            btnChild.title       = 'Adicionar subitem';
+            btnChild.style.fontSize = '0.7rem';
+            row.append(btnChild);
+        }
+
+        // Botão remover
+        const btnRemove = makeBtn('✕', 'btn-outline-danger btn-sm', () => removeItem(idx, parentIdx));
+        btnRemove.style.fontSize = '0.7rem';
+        row.append(btnRemove);
+
+        wrapper.appendChild(row);
+
+        // Subitens — listagem indentada
+        if (hasChildren) {
+            const childWrap = document.createElement('div');
+            childWrap.className = 'menu-children';
+            item.children.forEach((child, ci) => childWrap.appendChild(buildItemRow(child, ci, idx)));
+            wrapper.appendChild(childWrap);
+        }
+
+        return wrapper;
+    }
+
+    function makeBtn(texto, classes, handler) {
+        const btn     = document.createElement('button');
+        btn.type      = 'button';
+        btn.className = 'btn ' + classes;
+        btn.textContent = texto;
+        btn.onclick   = handler;
+        return btn;
+    }
+
+    function getRef(idx, parentIdx) {
+        return parentIdx === -1 ? menuState[idx] : menuState[parentIdx].children[idx];
+    }
+
+    function addMenuItem(parentIdx) {
+        if (parentIdx === -1) {
+            menuState.push({ title: 'Novo item', link: '/' });
+        } else {
+            if (!Array.isArray(menuState[parentIdx].children))
+                menuState[parentIdx].children = [];
+            delete menuState[parentIdx].link;
+            menuState[parentIdx].children.push({ title: 'Novo subitem', link: '/' });
+        }
+        updateMenuJSON();
+        renderMenuEditor();
+    }
+
+    function removeItem(idx, parentIdx) {
+        if (parentIdx === -1) {
+            menuState.splice(idx, 1);
+        } else {
+            menuState[parentIdx].children.splice(idx, 1);
+            if (menuState[parentIdx].children.length === 0) {
+                menuState[parentIdx].link = '/';
+                delete menuState[parentIdx].children;
+            }
+        }
+        updateMenuJSON();
+        renderMenuEditor();
+    }
+
+    function moveItem(idx, dir, parentIdx) {
+        const list = parentIdx === -1 ? menuState : menuState[parentIdx].children;
+        const to   = idx + dir;
+        if (to < 0 || to >= list.length) return;
+        [list[idx], list[to]] = [list[to], list[idx]];
+        updateMenuJSON();
+        renderMenuEditor();
+    }
+
+    // Troca de tabs do menu
+    function switchMenuTab(tab) {
+        const visualPane = document.getElementById('menuVisualPane');
+        const jsonPane   = document.getElementById('menuJsonPane');
+        const btnFmt     = document.getElementById('btnFormatMenu');
+        const tabV       = document.getElementById('tabVisual');
+        const tabJ       = document.getElementById('tabJson');
+
+        if (tab === 'visual') {
+            visualPane.style.display = '';
+            jsonPane.style.display   = 'none';
+            tabV.className = 'btn btn-secondary btn-sm';
+            tabJ.className = 'btn btn-outline-secondary btn-sm';
+            btnFmt.classList.add('d-none');
+            syncMenuFromJson();
+        } else {
+            visualPane.style.display = 'none';
+            jsonPane.style.display   = '';
+            tabV.className = 'btn btn-outline-secondary btn-sm';
+            tabJ.className = 'btn btn-secondary btn-sm';
+            btnFmt.classList.remove('d-none');
+            cmMenu.refresh();
+        }
+    }
 
     // Upload de ficheiro JSON para Landing Page
     document.getElementById('uploadLanding').addEventListener('change', function () {
@@ -225,11 +481,13 @@
         reader.onload = function (e) {
             try {
                 const parsed = JSON.parse(e.target.result);
-                landingTextarea.value = JSON.stringify(parsed, null, 2);
-                syncThemeFromJson();
+                cmLanding.setValue(JSON.stringify(parsed, null, 2));
+                syncQuickFromJson();
                 validateLandingJson();
+                showToast('Landing Page JSON carregado.', 'sucesso');
             } catch {
-                markField(landingTextarea, false, 'Ficheiro inválido: o conteúdo não é JSON válido.');
+                markEditor(landingWrap, landingFb, false, 'Ficheiro inválido: o conteúdo não é JSON válido.');
+                showToast('Ficheiro inválido: não é JSON válido.', 'erro');
             }
         };
         reader.readAsText(file);
@@ -244,10 +502,13 @@
         reader.onload = function (e) {
             try {
                 const parsed = JSON.parse(e.target.result);
-                menuTextarea.value = JSON.stringify(parsed, null, 2);
+                cmMenu.setValue(JSON.stringify(parsed, null, 2));
                 validateMenuJson();
+                syncMenuFromJson();
+                showToast('Menu JSON carregado.', 'sucesso');
             } catch {
-                markField(menuTextarea, false, 'Ficheiro inválido: o conteúdo não é JSON válido.');
+                markEditor(menuWrap, menuFb, false, 'Ficheiro inválido: o conteúdo não é JSON válido.');
+                showToast('Ficheiro inválido: não é JSON válido.', 'erro');
             }
         };
         reader.readAsText(file);
@@ -268,5 +529,12 @@
         };
         reader.readAsDataURL(file);
     });
+
+    // Arranque — pré-popular os campos rápidos e o editor visual
+    syncQuickFromJson();
+    syncMenuFromJson();
+    validateLandingJson();
+    validateMenuJson();
+
 </script>
 }
