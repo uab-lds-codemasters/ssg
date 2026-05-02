@@ -10,32 +10,48 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using StaticSiteGenerator.Models;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 
 namespace StaticSiteGenerator.Controllers
 {
+    public class ConfiguracaoInvalidaException : Exception
+    {
+        public string Sugestao { get; }
+        public ConfiguracaoInvalidaException(string mensagem, string sugestao) : base(mensagem)
+        {
+            Sugestao = sugestao;
+        }
+    }
     public class SiteController : Controller
     {
-        private bool DadosValidos(string landingJson, string menuJson)
+        
+        private void ValidarDadosEntrada(string landingJson, string menuJson)
         {
-            return !string.IsNullOrWhiteSpace(landingJson) && !string.IsNullOrWhiteSpace(menuJson);
-        }
-        private bool DadosDesserializados (string landingJson, string menuJson, 
-            out LandingPage? landingPage, out List<MenuItem>? menuItems)
-        {
-            landingPage = null;
-            menuItems = null;
+            if (string.IsNullOrWhiteSpace(landingJson))
+                throw new ConfiguracaoInvalidaException ("Os dados Json não podem ser vazios.", 
+                    "Preencha o ficheiro Json da landingPage.");
 
+            if(string.IsNullOrWhiteSpace(menuJson))
+                throw new ConfiguracaoInvalidaException("Os dados Json não podem ser vazios.",
+                    "Preencha o ficheiro Json do menu.");
+        }
+        private void DesserializarDados (string landingJson, string menuJson, 
+            out LandingPage landingPage, out List<MenuItem> menuItems)
+        {
             try
             {
-                landingPage = JsonConvert.DeserializeObject<LandingPage>(landingJson);
-                menuItems = JsonConvert.DeserializeObject<List<MenuItem>>(menuJson);
-
-                return landingPage != null && menuItems != null;
-            }
+                landingPage = JsonConvert.DeserializeObject<LandingPage>(landingJson)
+                    ?? throw new ConfiguracaoInvalidaException("O Json da landing page é inválido.",
+                    "Verifique a estrutura do ficheiro Json.");
+                menuItems = JsonConvert.DeserializeObject<List<MenuItem>>(menuJson)
+                    ?? throw new ConfiguracaoInvalidaException("O Json do menu é inválido.",
+                    "Verifique a lista de itens do menu.");
+            } 
             catch (JsonException)
             {
-                return false;
+                throw new ConfiguracaoInvalidaException("O formato dos ficheiros Json são inválidos.",
+                    "Verifique os ficheiros Json.");
             }
         }
         private SiteEditorViewModel CriarModelViewParaErro(string landingJson, string menuJson)
@@ -62,7 +78,7 @@ namespace StaticSiteGenerator.Controllers
         private IActionResult RetornarErro (string mensagem, string landingPage, string menuJson)
         {
             AoOcorrerErro?.Invoke(mensagem);
-            ModelState.AddModelError("", _mensagemErro);
+            ModelState.AddModelError("", _mensagemErro ?? mensagem);
             return View("Index", CriarModelViewParaErro(landingPage, menuJson));
 
         }
@@ -99,28 +115,28 @@ namespace StaticSiteGenerator.Controllers
         [HttpPost]
         public IActionResult Preview(string landingJson, string menuJson)
         {
-            if(!DadosValidos(landingJson, menuJson))
+            try
             {
-                RetornarErro("Os dados não podem ser vazios", landingJson, menuJson);
+                ValidarDadosEntrada(landingJson, menuJson);
+                DesserializarDados(landingJson, menuJson,
+                    out LandingPage landingPage, out List<MenuItem> menuItems);
+
+                SalvarDados(landingJson, menuJson);
+
+                SiteEditorViewModel viewModel = new SiteEditorViewModel
+                {
+                    LandingJson = landingJson,
+                    MenuJson = menuJson,
+                    LandingPage = landingPage,
+                    MenuItems = menuItems
+                };
+
+                return View(viewModel);
             }
-
-            if(!DadosDesserializados(landingJson, menuJson, out LandingPage? landingPage, out List<MenuItem>? menuItems))
+            catch (ConfiguracaoInvalidaException erro)
             {
-                RetornarErro("Ficheiros Json inválido", landingJson, menuJson);
+                return RetornarErro($"{erro.Message} Sugestão: {erro.Sugestao}", landingJson, menuJson);
             }
-
-            SalvarDados(landingJson, menuJson);
-
-
-            SiteEditorViewModel viewModel = new SiteEditorViewModel
-            {
-                LandingJson = landingJson,
-                MenuJson = menuJson,
-                LandingPage = landingPage ?? new LandingPage(),
-                MenuItems = menuItems ?? new List<MenuItem>()
-            };
-
-            return View(viewModel);
         }
     }
 }
