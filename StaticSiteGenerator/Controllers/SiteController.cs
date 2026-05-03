@@ -10,12 +10,94 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using StaticSiteGenerator.Models;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 
 namespace StaticSiteGenerator.Controllers
 {
+    public class ConfiguracaoInvalidaException : Exception
+    {
+        public string Sugestao { get; }
+        public ConfiguracaoInvalidaException(string mensagem, string sugestao) : base(mensagem)
+        {
+            Sugestao = sugestao;
+        }
+    }
     public class SiteController : Controller
     {
+        
+        private void ValidarDadosEntrada(string? landingJson, string? menuJson)
+        {
+            if (string.IsNullOrWhiteSpace(landingJson))
+                throw new ConfiguracaoInvalidaException ("Os dados Json não podem ser vazios.", 
+                    "Preencha o ficheiro Json da landingPage.");
+
+            if(string.IsNullOrWhiteSpace(menuJson))
+                throw new ConfiguracaoInvalidaException("Os dados Json não podem ser vazios.",
+                    "Preencha o ficheiro Json do menu.");
+        }
+        private void DesserializarDados (string landingJson, string menuJson, 
+            out LandingPage landingPage, out List<MenuItem> menuItems)
+        {
+            try
+            {
+                landingPage = JsonConvert.DeserializeObject<LandingPage>(landingJson)
+                    ?? throw new ConfiguracaoInvalidaException("O Json da landing page é inválido.",
+                    "Verifique a estrutura do ficheiro Json.");
+                menuItems = JsonConvert.DeserializeObject<List<MenuItem>>(menuJson)
+                    ?? throw new ConfiguracaoInvalidaException("O Json do menu é inválido.",
+                    "Verifique a lista de itens do menu.");
+            } 
+            catch (JsonException)
+            {
+                throw new ConfiguracaoInvalidaException("O formato dos ficheiros Json são inválidos.",
+                    "Verifique os ficheiros Json.");
+            }
+        }
+        private static string JsonValidoOuPadrao(string? json, string padrao)
+        {
+            if (string.IsNullOrWhiteSpace(json)) return padrao;
+            try { JsonConvert.DeserializeObject(json); return json; }
+            catch (JsonException) { return padrao; }
+        }
+
+        private SiteEditorViewModel CriarModelViewParaErro(string? landingJson, string? menuJson)
+        {
+            return new SiteEditorViewModel
+            {
+                LandingJson = JsonValidoOuPadrao(landingJson,
+                    "{\n  \"title\": \"\",\n  \"subtitle\": \"\",\n  \"theme\": \"default.css\"\n}"),
+                MenuJson = JsonValidoOuPadrao(menuJson, "[]")
+            };
+        }
+        public delegate void MostrarMensagemErro(string mensagem);
+        public event MostrarMensagemErro? AoOcorrerErro;
+        private string? _mensagemErro;
+        public SiteController()
+        {
+            AoOcorrerErro += GuardarMensagemErro;
+        }
+
+        private void GuardarMensagemErro (String mensagem)
+        {
+            _mensagemErro = mensagem ;
+        }
+       
+        private IActionResult RetornarErro (string mensagem, string? landingPage, string? menuJson)
+        {
+            AoOcorrerErro?.Invoke(mensagem);
+            ModelState.AddModelError("", _mensagemErro ?? mensagem);
+            return View("Index", CriarModelViewParaErro(landingPage, menuJson));
+
+        }
+        public void SalvarDados(string landingJson, string menuJson)
+        {
+            string dataFolder = Path.Combine(Directory.GetCurrentDirectory(), "Data");
+            Directory.CreateDirectory(dataFolder);
+
+            System.IO.File.WriteAllText(Path.Combine(dataFolder, "landingPage.json"), landingJson);
+            System.IO.File.WriteAllText(Path.Combine(dataFolder, "menu.json"), menuJson);
+        }
         public IActionResult Index()
         {
             string landingPath = Path.Combine(Directory.GetCurrentDirectory(), "Data", "landingPage.json");
@@ -39,26 +121,30 @@ namespace StaticSiteGenerator.Controllers
         }
 
         [HttpPost]
-        public IActionResult Preview(string landingJson, string menuJson)
+        public IActionResult Preview(string? landingJson, string? menuJson)
         {
-            LandingPage? landingPage = JsonConvert.DeserializeObject<LandingPage>(landingJson);
-            List<MenuItem>? menuItems = JsonConvert.DeserializeObject<List<MenuItem>>(menuJson);
-
-            string dataFolder = Path.Combine(Directory.GetCurrentDirectory(), "Data");
-            Directory.CreateDirectory(dataFolder);
-
-            System.IO.File.WriteAllText(Path.Combine(dataFolder, "landingPage.json"), landingJson);
-            System.IO.File.WriteAllText(Path.Combine(dataFolder, "menu.json"), menuJson);
-
-            SiteEditorViewModel viewModel = new SiteEditorViewModel
+            try
             {
-                LandingJson = landingJson,
-                MenuJson = menuJson,
-                LandingPage = landingPage ?? new LandingPage(),
-                MenuItems = menuItems ?? new List<MenuItem>()
-            };
+                ValidarDadosEntrada(landingJson, menuJson);
+                DesserializarDados(landingJson!, menuJson!,
+                    out LandingPage landingPage, out List<MenuItem> menuItems);
 
-            return View(viewModel);
+                SalvarDados(landingJson!, menuJson!);
+
+                SiteEditorViewModel viewModel = new SiteEditorViewModel
+                {
+                    LandingJson = landingJson!,
+                    MenuJson = menuJson!,
+                    LandingPage = landingPage,
+                    MenuItems = menuItems
+                };
+
+                return View(viewModel);
+            }
+            catch (ConfiguracaoInvalidaException erro)
+            {
+                return RetornarErro($"{erro.Message} Sugestão: {erro.Sugestao}", landingJson, menuJson);
+            }
         }
     }
 }

@@ -59,9 +59,23 @@ const Preview = {
      * @param {event} event - Evento de clique
      */
     handleMenuClick: function(event) {
-        event.preventDefault();
         const href = event.currentTarget.getAttribute('href');
+        const isExterno = href && (href.startsWith('http://') || href.startsWith('https://'));
+        if (isExterno) return;
+        event.preventDefault();
         this.loadIframe(href);
+    },
+
+    /**
+     * Fecha a iframe
+     */
+    fecharIframe: function() {
+        const frame = document.getElementById('conteudo-frame');
+        const container = document.getElementById('frame-container');
+        const aviso = document.getElementById('frame-aviso');
+        container.style.display = 'none';
+        frame.src = '';
+        aviso.style.display = 'none';
     },
 
     /**

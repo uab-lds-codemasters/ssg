@@ -14,7 +14,7 @@ namespace StaticSiteGenerator.Models
     {
         public string LandingJson { get; set; } = string.Empty;
         public string MenuJson { get; set; } = string.Empty;
-        public LandingPage LandingPage { get; set; } = new();
-        public List<MenuItem> MenuItems { get; set; } = new();
+        public LandingPage? LandingPage { get; set; }
+        public List<MenuItem>? MenuItems { get; set; }
     }
 }
