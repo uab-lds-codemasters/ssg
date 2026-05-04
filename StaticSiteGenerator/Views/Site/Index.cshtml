@@ -45,6 +45,9 @@
 <form id="editorForm" action="/Site/Preview" method="post" enctype="multipart/form-data">
     <input type="hidden" name="landingJson" id="landingJsonHidden" />
     <input type="hidden" name="menuJson" id="menuJsonHidden" />
+    <input type="hidden" id="existingImagePath" value="@landing.ImagePath" />
+    <input type="hidden" id="existingDocumentPath" value="@landing.DocumentPath" />
+    <input type="hidden" id="existingDocumentName" value="@landing.DocumentName" />
 
     <!-- Menu -->
     <div class="card mb-3">
@@ -55,24 +58,48 @@
         <div class="card-body">
             <div class="row g-2 mb-1 text-muted small px-1">
                 <div class="col">Nome</div>
-                <div class="col">Link</div>
-                <div class="col-auto" style="width:46px"></div>
+                <div class="col">Link <small class="text-muted">(opcional se tiver subitems)</small></div>
+                <div class="col-auto" style="width:90px"></div>
             </div>
             <div id="menuItems">
                 @foreach (var item in menuItems)
                 {
-                    <div class="row g-2 mb-2 menu-item">
-                        <div class="col">
-                            <input type="text" class="form-control menu-title"
-                                   placeholder="Ex: Início" value="@item.Title" />
+                    <div class="menu-item mb-2">
+                        <div class="row g-2 menu-item-row">
+                            <div class="col">
+                                <input type="text" class="form-control menu-title"
+                                       placeholder="Ex: Início" value="@item.Title" />
+                            </div>
+                            <div class="col">
+                                <input type="text" class="form-control menu-link"
+                                       placeholder="Ex: /" value="@item.Link" />
+                            </div>
+                            <div class="col-auto d-flex gap-1">
+                                <button type="button" class="btn btn-outline-secondary"
+                                        onclick="Editor.adicionarSubitem(this)" title="Adicionar subitem">&#8853;</button>
+                                <button type="button" class="btn btn-outline-danger"
+                                        onclick="Editor.removerItem(this)">&#10005;</button>
+                            </div>
                         </div>
-                        <div class="col">
-                            <input type="text" class="form-control menu-link"
-                                   placeholder="Ex: /" value="@item.Link" />
-                        </div>
-                        <div class="col-auto">
-                            <button type="button" class="btn btn-outline-danger"
-                                    onclick="Editor.removerItem(this)">&#10005;</button>
+                        <div class="menu-subitems ps-4 mt-1">
+                            @foreach (var child in item.Children)
+                            {
+                                <div class="row g-2 mb-1 menu-subitem">
+                                    <div class="col-auto d-flex align-items-center text-muted" style="width:28px">&#8627;</div>
+                                    <div class="col">
+                                        <input type="text" class="form-control form-control-sm menu-title"
+                                               placeholder="Ex: Google" value="@child.Title" />
+                                    </div>
+                                    <div class="col">
+                                        <input type="text" class="form-control form-control-sm menu-link"
+                                               placeholder="Ex: https://google.com" value="@child.Link" />
+                                    </div>
+                                    <div class="col-auto">
+                                        <button type="button" class="btn btn-sm btn-outline-danger"
+                                                onclick="Editor.removerItem(this)">&#10005;</button>
+                                    </div>
+                                </div>
+                            }
                         </div>
                     </div>
                 }

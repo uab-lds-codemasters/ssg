@@ -7,9 +7,11 @@
  */
 
 /**
- * Variável global para armazenar Base64 da imagem
+ * Variáveis globais para armazenar Base64 dos ficheiros
  */
 let currentImageBase64 = '';
+let currentDocumentBase64 = '';
+let currentDocumentName = '';
 
 /**
  * Objeto com funções do editor
@@ -22,6 +24,24 @@ const Editor = {
         this.setupEventListeners();
         this.setupThemeToggle();
         this.loadThemePreference();
+        this.loadImagemGuardada();
+    },
+
+    /**
+     * Re-hidrata Base64 de imagem e documento a partir dos hidden inputs
+     */
+    loadImagemGuardada: function() {
+        const existingImage = document.getElementById('existingImagePath')?.value;
+        if (existingImage && existingImage.startsWith('data:')) {
+            currentImageBase64 = existingImage;
+        }
+
+        const existingDoc = document.getElementById('existingDocumentPath')?.value;
+        const existingDocName = document.getElementById('existingDocumentName')?.value;
+        if (existingDoc && existingDocName) {
+            currentDocumentBase64 = existingDoc;
+            currentDocumentName = existingDocName;
+        }
     },
 
     /**
@@ -95,26 +115,62 @@ const Editor = {
         if (!container) return;
 
         const div = document.createElement('div');
-        div.className = 'row g-2 mb-2 menu-item';
+        div.className = 'menu-item mb-2';
         div.innerHTML = `
-            <div class="col">
-                <input type="text" class="form-control menu-title" placeholder="Ex: Início" />
+            <div class="row g-2 menu-item-row">
+                <div class="col">
+                    <input type="text" class="form-control menu-title" placeholder="Ex: Início" />
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control menu-link" placeholder="Ex: /" />
+                </div>
+                <div class="col-auto d-flex gap-1">
+                    <button type="button" class="btn btn-outline-secondary"
+                            onclick="Editor.adicionarSubitem(this)" title="Adicionar subitem">&#8853;</button>
+                    <button type="button" class="btn btn-outline-danger"
+                            onclick="Editor.removerItem(this)">&#10005;</button>
+                </div>
             </div>
-            <div class="col">
-                <input type="text" class="form-control menu-link" placeholder="Ex: /" />
-            </div>
-            <div class="col-auto">
-                <button type="button" class="btn btn-outline-danger" onclick="Editor.removerItem(this)">&#10005;</button>
-            </div>`;
+            <div class="menu-subitems ps-4 mt-1"></div>`;
         container.appendChild(div);
     },
 
     /**
-     * Remove item de menu
+     * Adiciona subitem a um item de menu
+     * @param {element} btn - Botão ⊕ clicado
+     */
+    adicionarSubitem: function(btn) {
+        const subitems = btn.closest('.menu-item').querySelector('.menu-subitems');
+        if (!subitems) return;
+
+        const div = document.createElement('div');
+        div.className = 'row g-2 mb-1 menu-subitem';
+        div.innerHTML = `
+            <div class="col-auto d-flex align-items-center text-muted" style="width:28px">&#8627;</div>
+            <div class="col">
+                <input type="text" class="form-control form-control-sm menu-title" placeholder="Ex: Google" />
+            </div>
+            <div class="col">
+                <input type="text" class="form-control form-control-sm menu-link" placeholder="Ex: https://google.com" />
+            </div>
+            <div class="col-auto">
+                <button type="button" class="btn btn-sm btn-outline-danger"
+                        onclick="Editor.removerItem(this)">&#10005;</button>
+            </div>`;
+        subitems.appendChild(div);
+    },
+
+    /**
+     * Remove item ou subitem de menu
      * @param {element} btn - Botão clicado
      */
     removerItem: function(btn) {
-        btn.closest('.menu-item').remove();
+        const subitem = btn.closest('.menu-subitem');
+        if (subitem) {
+            subitem.remove();
+        } else {
+            btn.closest('.menu-item').remove();
+        }
     },
 
     /**
@@ -188,17 +244,19 @@ const Editor = {
         const docName = document.getElementById('docName');
         const docPreview = document.getElementById('docPreview');
 
-        if (docName) {
-            docName.textContent = file.name;
-        }
-
+        if (docName) docName.textContent = file.name;
         if (docPreview) {
             docPreview.classList.remove('d-none');
-            // Força reflow
             docPreview.offsetHeight;
         }
 
-        Notifications.success('Documento carregado com sucesso');
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            currentDocumentBase64 = e.target.result;
+            currentDocumentName = file.name;
+            Notifications.success('Documento carregado com sucesso');
+        };
+        reader.readAsDataURL(file);
     },
 
     /**
@@ -212,25 +270,32 @@ const Editor = {
         const content = document.getElementById('siteContent').value;
         const footer = document.getElementById('siteFooter').value;
 
-        // Usar Base64 da imagem se existir, senão usar string vazia
         const landing = {
             title: title,
             subtitle: subtitle,
             theme: theme,
             content: content,
-            imagePath: currentImageBase64 ? currentImageBase64 : '',
-            documentPath: document.getElementById('siteDocument').value ? document.getElementById('siteDocument').files[0]?.name : '',
-            documentName: document.getElementById('docName').textContent || '',
+            imagePath: currentImageBase64 || document.getElementById('existingImagePath')?.value || '',
+            documentPath: currentDocumentBase64 || document.getElementById('existingDocumentPath')?.value || '',
+            documentName: currentDocumentName || document.getElementById('existingDocumentName')?.value || '',
             footer: footer
         };
 
         const items = [];
-        document.querySelectorAll('.menu-item').forEach(row => {
-            const title = row.querySelector('.menu-title').value.trim();
-            const link = row.querySelector('.menu-link').value.trim();
-            if (title && link) {
-                items.push({ title, link });
-            }
+        document.querySelectorAll('#menuItems > .menu-item').forEach(item => {
+            const row = item.querySelector('.menu-item-row');
+            const title = row?.querySelector('.menu-title')?.value.trim();
+            const link = row?.querySelector('.menu-link')?.value.trim() || '';
+            if (!title) return;
+
+            const children = [];
+            item.querySelectorAll('.menu-subitem').forEach(sub => {
+                const subTitle = sub.querySelector('.menu-title')?.value.trim();
+                const subLink = sub.querySelector('.menu-link')?.value.trim();
+                if (subTitle && subLink) children.push({ title: subTitle, link: subLink, children: [] });
+            });
+
+            items.push({ title, link, children });
         });
 
         const landingJson = JSON.stringify(landing, null, 2);

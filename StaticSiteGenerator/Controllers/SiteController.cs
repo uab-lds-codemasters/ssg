@@ -26,7 +26,7 @@ namespace StaticSiteGenerator.Controllers
     public class SiteController : Controller
     {
         
-        private void ValidarDadosEntrada(string landingJson, string menuJson)
+        private void ValidarDadosEntrada(string? landingJson, string? menuJson)
         {
             if (string.IsNullOrWhiteSpace(landingJson))
                 throw new ConfiguracaoInvalidaException ("Os dados Json não podem ser vazios.", 
@@ -54,12 +54,20 @@ namespace StaticSiteGenerator.Controllers
                     "Verifique os ficheiros Json.");
             }
         }
-        private SiteEditorViewModel CriarModelViewParaErro(string landingJson, string menuJson)
+        private static string JsonValidoOuPadrao(string? json, string padrao)
+        {
+            if (string.IsNullOrWhiteSpace(json)) return padrao;
+            try { JsonConvert.DeserializeObject(json); return json; }
+            catch (JsonException) { return padrao; }
+        }
+
+        private SiteEditorViewModel CriarModelViewParaErro(string? landingJson, string? menuJson)
         {
             return new SiteEditorViewModel
             {
-                LandingJson = landingJson,
-                MenuJson = menuJson
+                LandingJson = JsonValidoOuPadrao(landingJson,
+                    "{\n  \"title\": \"\",\n  \"subtitle\": \"\",\n  \"theme\": \"default.css\"\n}"),
+                MenuJson = JsonValidoOuPadrao(menuJson, "[]")
             };
         }
         public delegate void MostrarMensagemErro(string mensagem);
@@ -75,7 +83,7 @@ namespace StaticSiteGenerator.Controllers
             _mensagemErro = mensagem ;
         }
        
-        private IActionResult RetornarErro (string mensagem, string landingPage, string menuJson)
+        private IActionResult RetornarErro (string mensagem, string? landingPage, string? menuJson)
         {
             AoOcorrerErro?.Invoke(mensagem);
             ModelState.AddModelError("", _mensagemErro ?? mensagem);
@@ -113,20 +121,20 @@ namespace StaticSiteGenerator.Controllers
         }
 
         [HttpPost]
-        public IActionResult Preview(string landingJson, string menuJson)
+        public IActionResult Preview(string? landingJson, string? menuJson)
         {
             try
             {
                 ValidarDadosEntrada(landingJson, menuJson);
-                DesserializarDados(landingJson, menuJson,
+                DesserializarDados(landingJson!, menuJson!,
                     out LandingPage landingPage, out List<MenuItem> menuItems);
 
-                SalvarDados(landingJson, menuJson);
+                SalvarDados(landingJson!, menuJson!);
 
                 SiteEditorViewModel viewModel = new SiteEditorViewModel
                 {
-                    LandingJson = landingJson,
-                    MenuJson = menuJson,
+                    LandingJson = landingJson!,
+                    MenuJson = menuJson!,
                     LandingPage = landingPage,
                     MenuItems = menuItems
                 };

@@ -36,6 +36,10 @@ const Validation = {
         if (!url || url.trim() === '') {
             return true; // URL opcional
         }
+        // Aceita caminhos relativos (/, /sobre, etc.) e URLs absolutas
+        if (url.startsWith('/') || url.startsWith('./') || url.startsWith('../')) {
+            return true;
+        }
         try {
             new URL(url);
             return true;
@@ -105,11 +109,30 @@ const Validation = {
             if (!item.title || item.title.trim() === '') {
                 return { valid: false, error: `Item ${i + 1}: título é obrigatório` };
             }
-            if (!item.link || item.link.trim() === '') {
-                return { valid: false, error: `Item ${i + 1}: link é obrigatório` };
+
+            const temFilhos = item.children && item.children.length > 0;
+            if (!temFilhos) {
+                if (!item.link || item.link.trim() === '') {
+                    return { valid: false, error: `Item ${i + 1}: link é obrigatório (ou adiciona subitems)` };
+                }
+                if (!this.validateURL(item.link)) {
+                    return { valid: false, error: `Item ${i + 1}: link inválido` };
+                }
             }
-            if (!this.validateURL(item.link)) {
-                return { valid: false, error: `Item ${i + 1}: link inválido` };
+
+            if (temFilhos) {
+                for (let j = 0; j < item.children.length; j++) {
+                    const child = item.children[j];
+                    if (!child.title || child.title.trim() === '') {
+                        return { valid: false, error: `Item ${i + 1} › subitem ${j + 1}: título é obrigatório` };
+                    }
+                    if (!child.link || child.link.trim() === '') {
+                        return { valid: false, error: `Item ${i + 1} › subitem ${j + 1}: link é obrigatório` };
+                    }
+                    if (!this.validateURL(child.link)) {
+                        return { valid: false, error: `Item ${i + 1} › subitem ${j + 1}: link inválido` };
+                    }
+                }
             }
         }
 

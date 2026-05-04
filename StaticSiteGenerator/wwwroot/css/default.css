@@ -31,7 +31,7 @@ a:hover {
 /* --- Navegação — barra branca, texto azul escuro --- */
 nav {
     background-color: #ffffff;
-    padding: 12px 24px;
+    padding: 2px 24px;
     display: flex;
     gap: 8px;
     align-items: center;
@@ -55,7 +55,7 @@ nav a:hover {
 /* --- Header — fundo azul escuro, texto branco --- */
 header {
     background-color: #1f4e79;
-    padding: 48px 24px;
+    padding: 2px 24px;
     text-align: center;
     border-bottom: 4px solid #0a1929;
 }
@@ -107,6 +107,46 @@ footer p {
     margin: 0;
     font-size: 0.9rem;
     font-weight: 600;
+}
+
+/* --- Dropdown de menu --- */
+.nav-dropdown {
+    position: relative;
+}
+
+.nav-dropdown-toggle .dropdown-arrow {
+    font-size: 0.6rem;
+    vertical-align: middle;
+    opacity: 0.7;
+}
+
+.nav-dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #ffffff;
+    border: 1px solid #d0dce8;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    z-index: 100;
+    flex-direction: column;
+    min-width: 160px;
+    padding: 4px 0;
+}
+
+.nav-dropdown:hover .nav-dropdown-menu {
+    display: flex;
+}
+
+.nav-dropdown-menu a {
+    padding: 8px 16px;
+    white-space: nowrap;
+    border-radius: 0;
+}
+
+.nav-dropdown-menu a:hover {
+    background-color: #e8f0fe;
 }
 
 /* --- Responsividade --- */
