@@ -130,9 +130,14 @@
                 </select>
             </div>
             <div class="mb-3">
-                <label for="siteContent" class="form-label">Conteúdo</label>
-                <textarea id="siteContent" class="form-control" rows="10"
-                          placeholder="Escreve aqui o conteúdo principal da tua página...">@landing.Content</textarea>
+                <label for="siteContent" class="form-label">
+                    Conteúdo&nbsp;
+                    <small class="text-muted float-end">
+                        <span id="charCount">0</span> / 10000 caracteres
+                    </small>
+                </label>
+                <textarea id="siteContent" class="form-control" rows="10" maxlength="10000"
+                          placeholder="Aqui deverá ficar o conteudo da pagina">@landing.Content</textarea>
             </div>
             <div class="mb-3">
                 <label for="siteImage" class="form-label">Imagem de Conteúdo</label>
@@ -182,7 +187,10 @@
         </div>
     </div>
 
-    <button type="submit" class="btn btn-primary px-4">Gerar</button>
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary px-4">Gerar</button>
+        <button type="button" class="btn btn-outline-secondary px-4" onclick="Editor.limparFormulario()">Limpar seleções</button>
+    </div>
 </form>
 
 <script src="~/js/notifications.js"></script>
