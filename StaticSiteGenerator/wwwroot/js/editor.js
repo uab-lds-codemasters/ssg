@@ -25,6 +25,7 @@ const Editor = {
         this.setupThemeToggle();
         this.loadThemePreference();
         this.loadImagemGuardada();
+        this.setupCharacterCounter();
     },
 
     /**
@@ -104,6 +105,49 @@ const Editor = {
         const documentInput = document.getElementById('siteDocument');
         if (documentInput) {
             documentInput.addEventListener('change', (e) => this.handleDocumentChange(e));
+        }
+    },
+
+    /**
+     * Configura contador de caracteres para o campo de conteúdo
+     */
+    setupCharacterCounter: function() {
+        const contentTextarea = document.getElementById('siteContent');
+        const charCountElement = document.getElementById('charCount');
+
+        if (contentTextarea && charCountElement) {
+            // Atualizar contador ao carregar a página (conteúdo existente)
+            this.updateCharacterCount();
+
+            // Atualizar contador em tempo real ao digitar
+            contentTextarea.addEventListener('input', () => {
+                this.updateCharacterCount();
+            });
+        }
+    },
+
+    /**
+     * Atualiza o contador de caracteres
+     */
+    updateCharacterCount: function() {
+        const contentTextarea = document.getElementById('siteContent');
+        const charCountElement = document.getElementById('charCount');
+
+        if (contentTextarea && charCountElement) {
+            const currentLength = contentTextarea.value.length;
+            charCountElement.textContent = currentLength;
+
+            // Adicionar classe de aviso quando estiver próximo do limite
+            if (currentLength >= 9500) {
+                charCountElement.style.color = '#dc3545'; // vermelho
+                charCountElement.style.fontWeight = 'bold';
+            } else if (currentLength >= 8000) {
+                charCountElement.style.color = '#ffc107'; // amarelo/laranja
+                charCountElement.style.fontWeight = 'bold';
+            } else {
+                charCountElement.style.color = '';
+                charCountElement.style.fontWeight = '';
+            }
         }
     },
 
@@ -345,6 +389,57 @@ const Editor = {
         setTimeout(() => {
             document.getElementById('editorForm').submit();
         }, 500);
+    },
+
+    /**
+     * Limpa todos os campos do formulário
+     */
+    limparFormulario: function() {
+        // Confirmar ação
+        if (!confirm('Tem certeza que deseja limpar todos os campos do formulário?')) {
+            return;
+        }
+
+        // Limpar campos de configuração
+        document.getElementById('siteTitle').value = '';
+        document.getElementById('siteSubtitle').value = '';
+        document.getElementById('siteTheme').value = 'default.css';
+        document.getElementById('siteContent').value = '';
+        document.getElementById('siteFooter').value = '';
+
+        // Limpar preview de imagem
+        const imageInput = document.getElementById('siteImage');
+        if (imageInput) imageInput.value = '';
+        const imagePreview = document.getElementById('imagePreview');
+        if (imagePreview) imagePreview.classList.add('d-none');
+        currentImageBase64 = '';
+
+        // Limpar preview de documento
+        const documentInput = document.getElementById('siteDocument');
+        if (documentInput) documentInput.value = '';
+        const docPreview = document.getElementById('docPreview');
+        if (docPreview) docPreview.classList.add('d-none');
+        currentDocumentBase64 = '';
+        currentDocumentName = '';
+
+        // Limpar campos hidden
+        document.getElementById('existingImagePath').value = '';
+        document.getElementById('existingDocumentPath').value = '';
+        document.getElementById('existingDocumentName').value = '';
+
+        // Limpar todos os itens de menu
+        const menuContainer = document.getElementById('menuItems');
+        if (menuContainer) {
+            menuContainer.innerHTML = '';
+        }
+
+        // Atualizar contador de caracteres
+        this.updateCharacterCount();
+
+        // Limpar erros de validação
+        Validation.clearErrors();
+
+        Notifications.success('Formulário limpo com sucesso!');
     }
 };
 
