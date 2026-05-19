@@ -66,6 +66,9 @@ const Notifications = {
         // Criar elemento do toast
         const toast = document.createElement('div');
         toast.className = `toast toast-${type}`;
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'assertive');
+        toast.setAttribute('aria-atomic', 'true');
 
         // Conteúdo do toast
         const icon = this.getIcon(type);
@@ -135,20 +138,23 @@ const Notifications = {
     },
 
     /**
-     * Confirma ação com modal
+     * Confirma ação com modal (impede múltiplos modais abertos)
      * @param {string} message - Mensagem de confirmação
      * @param {Function} onConfirm - Callback se confirmar
      * @param {Function} onCancel - Callback se cancelar (opcional)
      */
     confirm: function(message, onConfirm, onCancel = null) {
+        // Impedir múltiplos modais abertos
+        if (document.querySelector('.confirmation-modal.active')) return;
+
         const modal = document.createElement('div');
         modal.className = 'confirmation-modal';
         modal.innerHTML = `
             <div class="confirmation-modal-content">
                 <p class="confirmation-message">${this.escapeHtml(message)}</p>
                 <div class="confirmation-buttons">
-                    <button class="btn btn-secondary btn-cancel">Cancelar</button>
-                    <button class="btn btn-danger btn-confirm">Eliminar</button>
+                    <button class="btn btn-secondary btn-cancel" aria-label="Cancelar ação">Cancelar</button>
+                    <button class="btn btn-danger btn-confirm" aria-label="Confirmar eliminação">Eliminar</button>
                 </div>
             </div>
         `;
@@ -164,7 +170,11 @@ const Notifications = {
         const confirmBtn = modal.querySelector('.btn-confirm');
         const cancelBtn = modal.querySelector('.btn-cancel');
 
+        let fechado = false;
         const close = () => {
+            if (fechado) return;
+            fechado = true;
+            document.removeEventListener('keydown', handleEsc);
             modal.classList.remove('active');
             setTimeout(() => {
                 if (modal.parentNode) {
@@ -194,7 +204,6 @@ const Notifications = {
         // Fechar com ESC
         const handleEsc = (e) => {
             if (e.key === 'Escape') {
-                document.removeEventListener('keydown', handleEsc);
                 close();
                 if (onCancel) onCancel();
             }

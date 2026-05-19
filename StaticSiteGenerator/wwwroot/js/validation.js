@@ -213,6 +213,18 @@ const Validation = {
                 container.appendChild(div);
             });
             container.style.display = 'block';
+
+            // Foco no primeiro campo inválido
+            const firstField = document.getElementById('siteTitle');
+            if (firstField && errors.some(e => e.includes('Título'))) {
+                firstField.focus();
+            }
+
+            // Auto-dismiss após 5s
+            clearTimeout(this._errorTimer);
+            this._errorTimer = setTimeout(() => {
+                this.clearErrors();
+            }, 5000);
         } else {
             container.style.display = 'none';
         }
