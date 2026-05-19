@@ -231,6 +231,49 @@ const Editor = {
     },
 
     /**
+     * Configura contador de caracteres para o campo de conteúdo
+     */
+    setupCharacterCounter: function() {
+        const contentTextarea = document.getElementById('siteContent');
+        const charCountElement = document.getElementById('charCount');
+
+        if (contentTextarea && charCountElement) {
+            // Atualizar contador ao carregar a página (conteúdo existente)
+            this.updateCharacterCount();
+
+            // Atualizar contador em tempo real ao digitar
+            contentTextarea.addEventListener('input', () => {
+                this.updateCharacterCount();
+            });
+        }
+    },
+
+    /**
+     * Atualiza o contador de caracteres
+     */
+    updateCharacterCount: function() {
+        const contentTextarea = document.getElementById('siteContent');
+        const charCountElement = document.getElementById('charCount');
+
+        if (contentTextarea && charCountElement) {
+            const currentLength = contentTextarea.value.length;
+            charCountElement.textContent = currentLength;
+
+            // Adicionar classe de aviso quando estiver próximo do limite
+            if (currentLength >= 9500) {
+                charCountElement.style.color = '#dc3545'; // vermelho
+                charCountElement.style.fontWeight = 'bold';
+            } else if (currentLength >= 8000) {
+                charCountElement.style.color = '#ffc107'; // amarelo/laranja
+                charCountElement.style.fontWeight = 'bold';
+            } else {
+                charCountElement.style.color = '';
+                charCountElement.style.fontWeight = '';
+            }
+        }
+    },
+
+    /**
      * Adiciona novo item de menu
      */
     adicionarItem: function() {

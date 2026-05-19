@@ -15,12 +15,27 @@ using System.IO;
 
 namespace StaticSiteGenerator.Controllers
 {
-    public class ConfiguracaoInvalidaException : Exception
+    public class ConfiguracaoInvalidaException : Exception, IErroConfiguracao
     {
+        public string Mensagem => Message;
         public string Sugestao { get; }
         public ConfiguracaoInvalidaException(string mensagem, string sugestao) : base(mensagem)
         {
             Sugestao = sugestao;
+        }
+    }
+
+    public class ErroFicheiroNaoEncontrado : Exception, IErroConfiguracao
+    {
+        public string Mensagem => Message;
+        public string Sugestao { get; }
+        public string CaminhoFicheiro { get; }
+
+        public ErroFicheiroNaoEncontrado(string caminhoFicheiro)
+            : base($"Ficheiro não encontrado: {caminhoFicheiro}")
+        {
+            CaminhoFicheiro = caminhoFicheiro;
+            Sugestao = $"Verifique se o ficheiro existe em: {caminhoFicheiro}";
         }
     }
     public class SiteController : Controller
@@ -88,7 +103,20 @@ namespace StaticSiteGenerator.Controllers
             AoOcorrerErro?.Invoke(mensagem);
             ModelState.AddModelError("", _mensagemErro ?? mensagem);
             return View("Index", CriarModelViewParaErro(landingPage, menuJson));
+        }
 
+        private IActionResult RetornarErro(IErroConfiguracao erro, string? landingPage, string? menuJson)
+        {
+            return RetornarErro(
+                $"{erro.Mensagem} Sugestão: {erro.Sugestao}",
+                landingPage, menuJson);
+        }
+
+        private string LerFicheiro(string caminho, string conteudoPadrao)
+        {
+            if (!System.IO.File.Exists(caminho))
+                throw new ErroFicheiroNaoEncontrado(caminho);
+            return System.IO.File.ReadAllText(caminho);
         }
         public void SalvarDados(string landingJson, string menuJson)
         {
@@ -103,13 +131,18 @@ namespace StaticSiteGenerator.Controllers
             string landingPath = Path.Combine(Directory.GetCurrentDirectory(), "Data", "landingPage.json");
             string menuPath = Path.Combine(Directory.GetCurrentDirectory(), "Data", "menu.json");
 
-            string landingJson = System.IO.File.Exists(landingPath)
-                ? System.IO.File.ReadAllText(landingPath)
-                : "{\n  \"title\": \"CodeMasters Static Site\",\n  \"subtitle\": \"Exemplo de página inicial\",\n  \"theme\": \"default.css\"\n}";
+            string landingJson = "{\n  \"title\": \"CodeMasters Static Site\",\n  \"subtitle\": \"Exemplo de página inicial\",\n  \"theme\": \"default.css\"\n}";
+            string menuJson = "[\n  {\n    \"title\": \"Início\",\n    \"link\": \"/\"\n  }\n]";
 
-            string menuJson = System.IO.File.Exists(menuPath)
-                ? System.IO.File.ReadAllText(menuPath)
-                : "[\n  {\n    \"title\": \"Início\",\n    \"link\": \"/\"\n  }\n]";
+            try
+            {
+                landingJson = LerFicheiro(landingPath, landingJson);
+                menuJson    = LerFicheiro(menuPath, menuJson);
+            }
+            catch (Exception ex) when (ex is IErroConfiguracao)
+            {
+                // Mantém os valores padrão definidos acima
+            }
 
             SiteEditorViewModel viewModel = new SiteEditorViewModel
             {
@@ -141,9 +174,9 @@ namespace StaticSiteGenerator.Controllers
 
                 return View(viewModel);
             }
-            catch (ConfiguracaoInvalidaException erro)
+            catch (Exception ex) when (ex is IErroConfiguracao erro)
             {
-                return RetornarErro($"{erro.Message} Sugestão: {erro.Sugestao}", landingJson, menuJson);
+                return RetornarErro(erro, landingJson, menuJson);
             }
         }
     }
