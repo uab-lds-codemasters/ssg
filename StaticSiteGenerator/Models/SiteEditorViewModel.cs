@@ -16,5 +16,6 @@ namespace StaticSiteGenerator.Models
         public string MenuJson { get; set; } = string.Empty;
         public LandingPage LandingPage { get; set; } = new();
         public List<MenuItem> MenuItems { get; set; } = new();
+        public string? ErroMensagem { get; set; }
     }
 }
