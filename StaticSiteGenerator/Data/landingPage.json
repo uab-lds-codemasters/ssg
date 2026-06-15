@@ -1,10 +1,10 @@
 {
-  "title": "teste",
-  "subtitle": "teste1",
+  "title": "CodeMasters Static Site",
+  "subtitle": "Exemplo de página inicial",
   "theme": "default.css",
   "content": "",
   "imagePath": "",
   "documentPath": "",
   "documentName": "",
-  "footer": ""
+  "footer": "Gerado com CodeMasters SSG"
 }

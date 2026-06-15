@@ -139,9 +139,10 @@ namespace StaticSiteGenerator.Controllers
                 landingJson = LerFicheiro(landingPath, landingJson);
                 menuJson    = LerFicheiro(menuPath, menuJson);
             }
-            catch (Exception ex) when (ex is IErroConfiguracao)
+            catch (Exception ex) when (ex is IErroConfiguracao erro)
             {
-                // Mantém os valores padrão definidos acima
+                AoOcorrerErro?.Invoke($"{erro.Mensagem} Sugestão: {erro.Sugestao}");
+                ModelState.AddModelError("", _mensagemErro ?? $"{erro.Mensagem} Sugestão: {erro.Sugestao}");
             }
 
             SiteEditorViewModel viewModel = new SiteEditorViewModel
