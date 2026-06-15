@@ -22,6 +22,7 @@ const Preview = {
             this.temaAtual = temaElement.getAttribute('data-tema');
             this.mudarTema(this.temaAtual);
         }
+        this.mudarVista('100%');
     },
 
     /**
@@ -69,6 +70,33 @@ const Preview = {
     /**
      * Fecha a iframe
      */
+    /**
+     * Muda a largura da vista (responsive preview)
+     * @param {string} width - Largura (ex: '100%', '768px', '375px')
+     */
+    mudarVista: function(width) {
+        const main = document.querySelector('main');
+        const header = document.querySelector('header');
+        const nav = document.querySelector('nav');
+        const footerElem = document.querySelector('footer');
+        const elements = [main, header, nav, footerElem].filter(Boolean);
+
+        elements.forEach(el => {
+            if (width === '100%') {
+                el.style.maxWidth = '';
+                el.style.margin = '';
+            } else {
+                el.style.maxWidth = width;
+                el.style.margin = '0 auto';
+            }
+        });
+
+        document.querySelectorAll('.btn-vista').forEach(b => b.classList.remove('ativo'));
+        const id = 'view-' + (width === '100%' ? 'desktop' : width === '768px' ? 'tablet' : 'mobile');
+        const btn = document.getElementById(id);
+        if (btn) btn.classList.add('ativo');
+    },
+
     fecharIframe: function() {
         const frame = document.getElementById('conteudo-frame');
         const container = document.getElementById('frame-container');

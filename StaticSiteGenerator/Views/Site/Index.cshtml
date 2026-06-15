@@ -11,6 +11,9 @@
 
 <link rel="stylesheet" href="~/css/editor.css" />
 
+<!-- Skip link para navegação por teclado -->
+<a href="#editorForm" class="skip-link">Saltar para o formulário</a>
+
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div class="d-flex align-items-center gap-3">
         <img src="~/css/img/logo.jpg" alt="Logo CodeMasters" style="height: 80px; width: auto;" />
@@ -28,8 +31,8 @@
 </div>
 
 <!-- Mensagens de Erro e Sucesso -->
-<div id="errorMessages"></div>
-<div id="successMessage" class="alert alert-success"></div>
+<div id="errorMessages" aria-live="polite" aria-atomic="true" role="alert"></div>
+<div id="successMessage" class="alert alert-success" aria-live="polite" aria-atomic="true" role="status"></div>
 
 @if (!ViewData.ModelState.IsValid)
 {
@@ -53,7 +56,7 @@
     <div class="card mb-3">
         <div class="card-header fw-bold d-flex justify-content-between align-items-center">
             Menu de Navegação
-            <button type="button" class="btn btn-sm btn-outline-primary" onclick="Editor.adicionarItem()">+ Adicionar item</button>
+            <button type="button" class="btn btn-sm btn-outline-primary" onclick="Editor.adicionarItem()" aria-label="Adicionar item ao menu">+ Adicionar item</button>
         </div>
         <div class="card-body">
             <div class="row g-2 mb-1 text-muted small px-1">
@@ -64,7 +67,7 @@
             <div id="menuItems">
                 @foreach (var item in menuItems)
                 {
-                    <div class="menu-item mb-2">
+                    <div class="menu-item mb-2" draggable="true" title="Arrastar para reordenar">
                         <div class="row g-2 menu-item-row">
                             <div class="col">
                                 <input type="text" class="form-control menu-title"
@@ -153,7 +156,10 @@
                 <div id="imagePreview" class="mt-2 d-none">
                     <img id="previewImg" src="" alt="Pré-visualização"
                          class="img-thumbnail" style="max-height: 150px;" />
-                    <small class="text-muted d-block mt-1">Pré-visualização — será guardada ao clicar Gerar.</small>
+                    <small class="text-muted d-block mt-1">
+                        <span id="imageFileSize"></span>
+                        Pré-visualização — será guardada ao clicar Gerar.
+                    </small>
                 </div>
             </div>
             <div class="mb-3">
@@ -172,7 +178,7 @@
                     <div class="alert alert-success d-flex align-items-center gap-2 py-2 mb-0">
                         <span>&#128196;</span>
                         <span>Selecionado: <strong id="docName"></strong></span>
-                        <small class="text-muted ms-1">— será guardado ao clicar Gerar</small>
+                        <small class="text-muted ms-1">(<span id="docFileSize"></span>) — será guardado ao clicar Gerar</small>
                     </div>
                 </div>
                 <small class="form-text text-muted mt-1 d-block">
@@ -187,11 +193,103 @@
         </div>
     </div>
 
-    <div class="d-flex gap-2">
+    <div class="d-flex gap-2 flex-wrap align-items-center">
         <button type="submit" class="btn btn-primary px-4">Gerar</button>
         <button type="button" class="btn btn-outline-secondary px-4" onclick="Editor.limparFormulario()">Limpar seleções</button>
+        <button type="button" class="btn btn-outline-info px-3" onclick="Editor.exportarConfig()">&#128230; Exportar</button>
+        <button type="button" class="btn btn-outline-info px-3" onclick="Editor.importarAbrir()">&#128194; Importar</button>
+        <input type="file" id="importInput" accept=".json" style="display:none" onchange="Editor.importarConfig(this)" />
+        <button type="button" class="btn btn-outline-success px-3" onclick="Editor.mostrarTemplates()">&#128203; Templates</button>
+        <button type="button" class="btn btn-outline-secondary px-2" onclick="Editor.mostrarAtalhos()" title="Atalhos de teclado" aria-label="Atalhos de teclado">&#63;</button>
+        <span id="saveIndicator" class="save-indicator ms-auto"></span>
     </div>
 </form>
+
+<!-- Modal de Preview AJAX -->
+<div id="previewModal" class="preview-modal d-none">
+    <div class="preview-modal-backdrop"></div>
+    <div class="preview-modal-content">
+        <div class="preview-modal-header">
+            <h2>Pré-visualização</h2>
+            <div class="preview-modal-header-buttons">
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="Editor.toggleFullscreenPreview()" title="Ecrã inteiro" aria-label="Ecrã inteiro">&#10530;</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="Editor.fecharPreview()" aria-label="Fechar pré-visualização">&times;</button>
+            </div>
+        </div>
+        <div class="preview-modal-body">
+            <div id="previewLoading" class="preview-loading">
+                <div class="skeleton skeleton-title"></div>
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-image"></div>
+            </div>
+            <iframe id="previewIframe" class="preview-iframe" srcdoc=""></iframe>
+        </div>
+        <div class="preview-modal-footer">
+            <div class="preview-size-buttons">
+                <button type="button" class="btn btn-sm btn-outline-secondary preview-size-btn active" data-width="100%" onclick="Editor.mudarTamanhoPreview('100%')">Desktop</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary preview-size-btn" data-width="768px" onclick="Editor.mudarTamanhoPreview('768px')">Tablet</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary preview-size-btn" data-width="375px" onclick="Editor.mudarTamanhoPreview('375px')">Mobile</button>
+            </div>
+            <a id="previewOpenNew" href="#" target="_blank" class="btn btn-sm btn-primary">Abrir em nova aba &#8599;</a>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Templates -->
+<div id="templateModal" class="preview-modal d-none">
+    <div class="preview-modal-backdrop"></div>
+    <div class="preview-modal-content template-modal-content">
+        <div class="preview-modal-header">
+            <h2>Escolher Template</h2>
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="Editor.fecharTemplates()">&times;</button>
+        </div>
+        <div class="preview-modal-body">
+            <div class="template-grid">
+                <div class="template-card" data-template="blog">
+                    <div class="template-card-preview template-blog"></div>
+                    <h5>Blog</h5>
+                    <p>Layout clássico de blog com artigo destacado e sidebar.</p>
+                </div>
+                <div class="template-card" data-template="landing">
+                    <div class="template-card-preview template-landing"></div>
+                    <h5>Landing Page</h5>
+                    <p>Página única com hero, secções e call-to-action.</p>
+                </div>
+                <div class="template-card" data-template="portfolio">
+                    <div class="template-card-preview template-portfolio"></div>
+                    <h5>Portfolio</h5>
+                    <p>Mostruário de projetos com grelha e filtros.</p>
+                </div>
+                <div class="template-card" data-template="documentation">
+                    <div class="template-card-preview template-documentation"></div>
+                    <h5>Documentação</h5>
+                    <p>Documentação técnica com navegação lateral.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Atalhos de Teclado -->
+<div id="shortcutsModal" class="preview-modal d-none">
+    <div class="preview-modal-backdrop"></div>
+    <div class="preview-modal-content shortcuts-modal-content">
+        <div class="preview-modal-header">
+            <h2>Atalhos de Teclado</h2>
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="Editor.fecharAtalhos()">&times;</button>
+        </div>
+        <div class="preview-modal-body">
+            <table class="shortcuts-table">
+                <tr><td><kbd>Ctrl</kbd> + <kbd>Enter</kbd></td><td>Submeter formulário</td></tr>
+                <tr><td><kbd>Ctrl</kbd> + <kbd>Z</kbd></td><td>Desfazer</td></tr>
+                <tr><td><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Z</kbd></td><td>Refazer</td></tr>
+                <tr><td><kbd>Ctrl</kbd> + <kbd>Y</kbd></td><td>Refazer</td></tr>
+                <tr><td><kbd>?</kbd></td><td>Abrir esta ajuda</td></tr>
+            </table>
+        </div>
+    </div>
+</div>
 
 <script src="~/js/notifications.js"></script>
 <script src="~/js/validation.js"></script>

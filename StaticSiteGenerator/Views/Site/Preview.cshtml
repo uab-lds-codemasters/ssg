@@ -18,8 +18,9 @@
     <title>@Model.LandingPage.Title</title>
     <link id="temaCSS" rel="stylesheet" href="/css/@temaAtual" />
     <style>
-        .nav-temas { display: flex; align-items: center; gap: 6px; }
+        .nav-temas { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
         .nav-temas span { font-size: 0.8rem; opacity: 0.75; }
+        .nav-separator { width: 1px; height: 20px; background: rgba(255,255,255,0.3); margin: 0 6px; }
         .btn-tema {
             font-size: 0.78rem;
             padding: 3px 10px;
@@ -34,6 +35,20 @@
         }
         .btn-tema:hover { opacity: 1; background: rgba(255,255,255,0.15); }
         .btn-tema.ativo { opacity: 1; background: rgba(255,255,255,0.25); border-color: rgba(255,255,255,0.8); font-weight: bold; }
+        .btn-vista {
+            font-size: 0.78rem;
+            padding: 3px 10px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.4);
+            background: transparent;
+            color: inherit;
+            cursor: pointer;
+            opacity: 0.75;
+            transition: opacity 0.2s, background 0.2s;
+            text-decoration: none;
+        }
+        .btn-vista:hover { opacity: 1; background: rgba(255,255,255,0.15); }
+        .btn-vista.ativo { opacity: 1; background: rgba(255,255,255,0.25); border-color: rgba(255,255,255,0.8); font-weight: bold; }
     </style>
 </head>
 <body data-tema="@temaAtual">
@@ -74,9 +89,15 @@
             }
         </div>
         <div class="nav-temas">
+            <span>Temas:</span>
             <a href="#" class="btn-tema" id="btn-default" onclick="Preview.mudarTema('default.css'); return false;">Default</a>
             <a href="#" class="btn-tema" id="btn-dark"    onclick="Preview.mudarTema('dark.css');    return false;">Dark</a>
             <a href="#" class="btn-tema" id="btn-light"   onclick="Preview.mudarTema('light.css');   return false;">Light</a>
+            <span class="nav-separator"></span>
+            <span>Vista:</span>
+            <a href="#" class="btn-vista" id="view-desktop" onclick="Preview.mudarVista('100%'); return false;">Desktop</a>
+            <a href="#" class="btn-vista" id="view-tablet"  onclick="Preview.mudarVista('768px');  return false;">Tablet</a>
+            <a href="#" class="btn-vista" id="view-mobile"  onclick="Preview.mudarVista('375px');  return false;">Mobile</a>
         </div>
     </nav>
 
